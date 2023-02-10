@@ -39,7 +39,7 @@ namespace EmbyTime
 
         bool isExpired()
         {
-            return (m_interval_end_ms > 0) && (SailSystem::upTimeMs() >= m_interval_end_ms);
+            return (m_interval_end_ms > 0) && (EmbySystem::upTimeMs() >= m_interval_end_ms);
         }
 
         uint64_t getCountdownMs()
@@ -61,7 +61,7 @@ namespace EmbyTime
             }
             if (m_duration_ms > 0)
             {
-                m_interval_end_ms = SailSystem::upTimeMs() + m_duration_ms;
+                m_interval_end_ms = EmbySystem::upTimeMs() + m_duration_ms;
                 return true;
             }
             else
@@ -72,13 +72,13 @@ namespace EmbyTime
 
         uint64_t leftMs()
         {
-            return m_interval_end_ms > 0 ? m_interval_end_ms - SailSystem::upTimeMs() : 0;
+            return m_interval_end_ms > 0 ? m_interval_end_ms - EmbySystem::upTimeMs() : 0;
         }
 
     private:
         uint64_t m_duration_ms;
         uint64_t m_interval_end_ms;
     };
-} // namespace SailTime
+} // namespace EmbyTime
 
 #endif
