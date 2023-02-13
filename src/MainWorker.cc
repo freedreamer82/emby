@@ -6,6 +6,8 @@
 #include <EmbyMachine/Serial.hh>
 #include "Console/ConsoleCommands.hh"
 #include <EmbyLog/Log.hh>
+
+
 #ifdef EMBY_BUILD_X86
 #include "ConsoleTelnet.hh"
 #include <EmbyLog/StdLogProcessor.hh>
@@ -16,12 +18,22 @@
 EmbyLog_MODULE_LOG_CLASS("main");
 
 using namespace EmbyLibs;
+using namespace EmbySystem;
+
+
+bool MainWorker::onErrors(EmbySystem::ErrorCode *err, EmbySystem::SystemError::Status status)
+{
+    log_error("This is fake error: %d ,%S", int(err->getCode()), err->getDescription());
+    return false;
+}
 
 
 MainWorker::MainWorker() :
         m_thread(this, "Main", STACK_SIZE, PRIORITY)
 {
-
+    EmbySystem::SystemError::SystemErrorCallback cb;
+    cb.attach(this, &MainWorker::onErrors);
+    SystemError::get().setErrorCallback(cb);
 }
 
 MainWorker::~MainWorker()
@@ -34,6 +46,7 @@ MainWorker::doWork()
 {
 
 #ifdef EMBY_BUILD_ARM
+
 
     EmbyMachine::Serial::Serial_Config uartConfig;
     uartConfig.baudRate = EmbyMachine::Serial::Serial_BaudRate::Serial_BaudRate_115200;
@@ -64,12 +77,14 @@ MainWorker::doWork()
     log_info("Starting telnet localhost:3000");
 #endif
 
-
-
+    int errcode = 0;
     while (true)
     {
         log_info("This is a log Test");
-        EmbySystem::delayMs(10000);
+        EmbySystem::delayMs(5000);
+        log_info("Fire Error Test");
+        ErrorCode err{errcode++, upTimeMs(), "TestError"};
+        SystemError::get().addError(err);
     }
 
     EmbySystem::reboot();

@@ -50,7 +50,7 @@ file(GLOB_RECURSE EMBY_SOURCES
         "${EMBY_FOLDER}/PlatformAgnostic/EmbyLibs/*.cc"
         "${EMBY_FOLDER}/PlatformAgnostic/EmbyLog/*.cc"
         "${EMBY_FOLDER}/PlatformAgnostic/EmbyMachine/*.cc"
-        "${EMBY_FOLDER}/PlatformAgnostic/System/*.cc"
+        "${EMBY_FOLDER}/PlatformAgnostic/EmbySystem/*.cc"
         "${EMBY_FOLDER}/PlatformAgnostic/EmbyThreading/*.cc"
         "${EMBY_FOLDER}/PlatformAgnostic/EmbyTime/*.cc"
         )

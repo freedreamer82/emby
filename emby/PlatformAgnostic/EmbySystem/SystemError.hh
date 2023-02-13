@@ -8,11 +8,18 @@
 #ifndef SYSTEMERROR_HH_
 #define SYSTEMERROR_HH_
 
+#include <stdint.h>
 #include <EmbyLibs/Singleton.hh>
 #include <EmbyLibs/Buffer.hh>
 #include <EmbySystem/ErrorCode.hh>
+#include <EmbyLibs/Callback.hh>
 #include <EmbyThreading/Mutex.hh>
 #include <EmbySystem/SystemErrorHandler.hh>
+
+
+#ifndef EMBY_CFG_SYSTEM_ERROR_BUFFER_SIZE
+#define   EMBY_CFG_SYSTEM_ERROR_BUFFER_SIZE  10
+#endif
 
 namespace EmbySystem
 {
@@ -20,12 +27,18 @@ namespace EmbySystem
     {
     public:
 
-        static uint16_t constexpr
-        ERROR_BUFFER_SIZE = 20;
+        enum class Status : uint8_t
+        {
+            NoError,
+            BufferFull
+        };
+
+        //Return true if Error Consumed otherwise false and will be pushed in the buffer
+        typedef EmbyLibs::Callback<bool, ErrorCode *, Status> SystemErrorCallback;
 
         SystemError();
 
-        bool addError(ErrorCode &&error, bool syncHandling = false);
+        bool addError(ErrorCode &error);
 
         bool clearAllErrors();
 
@@ -35,13 +48,13 @@ namespace EmbySystem
 
         ErrorCode const *getErrorAt(unsigned index) const;
 
-        EmbyLibs::Buffer <ErrorCode, ERROR_BUFFER_SIZE>
+        EmbyLibs::Buffer<ErrorCode, EMBY_CFG_SYSTEM_ERROR_BUFFER_SIZE>
         getErrorBufferCopy() const;
 
         void handleErrors();
 
 
-        bool setErrorHandler(SystemErrorHandler *handler);
+        bool setErrorCallback(SystemErrorCallback &cb);
 
     protected:
         SystemError(SystemError const &);
@@ -54,8 +67,8 @@ namespace EmbySystem
 
 
         EmbyThreading::Mutex mutable m_mutex;
-        EmbyLibs::Buffer <ErrorCode, ERROR_BUFFER_SIZE> m_buffer;
-        SystemErrorHandler *m_handler;
+        EmbyLibs::Buffer<ErrorCode, EMBY_CFG_SYSTEM_ERROR_BUFFER_SIZE> m_buffer;
+        SystemErrorCallback m_cb;
     };
 }
 
