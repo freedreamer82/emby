@@ -14,7 +14,6 @@
 #include <EmbySystem/ErrorCode.hh>
 #include <EmbyLibs/Callback.hh>
 #include <EmbyThreading/Mutex.hh>
-#include <EmbySystem/SystemErrorHandler.hh>
 
 
 #ifndef EMBY_CFG_SYSTEM_ERROR_BUFFER_SIZE

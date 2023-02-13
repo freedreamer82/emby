@@ -23,7 +23,7 @@ using namespace EmbySystem;
 
 bool MainWorker::onErrors(EmbySystem::ErrorCode *err, EmbySystem::SystemError::Status status)
 {
-    log_error("This is fake error: %d ,%S", int(err->getCode()), err->getDescription());
+    log_error("This is fake error: @%d, %d ,%S",  err->getTime(),int(err->getCode()), err->getDescription());
     return false;
 }
 

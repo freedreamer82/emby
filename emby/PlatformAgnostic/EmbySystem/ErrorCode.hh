@@ -12,29 +12,29 @@
 
 namespace EmbySystem
 {
-	class ErrorCode
-	{
-		public:
-	        typedef int ErrorTypeCode;
-	        static constexpr int  ErrorTypeCode_NONE = -1;
+    class ErrorCode
+    {
+    public:
+        typedef int ErrorTypeCode;
+        static constexpr int ErrorTypeCode_NONE = -1;
 
-			ErrorCode( ErrorTypeCode code,
-			           EmbyTime::Millis time,
-			           EmbyLibs::String description = "" );
+        ErrorCode(ErrorTypeCode code,
+                  EmbyTime::Millis time,
+                  EmbyLibs::String description = "");
 
-			ErrorCode();
+        ErrorCode();
 
-			ErrorTypeCode getCode() const;
+        ErrorTypeCode getCode() const;
 
-			EmbyLibs::String const& getDescription() const;
+        EmbyLibs::String const &getDescription() const;
 
-			EmbyTime::Millis getTime() const;
+        EmbyTime::Millis getTime() const;
 
-		private:
-			EmbyLibs::String     m_description;
-			EmbyTime::Millis            m_time;
-			ErrorTypeCode               m_code;
-	};
+    private:
+        EmbyLibs::String m_description;
+        EmbyTime::Millis m_time;
+        ErrorTypeCode m_code;
+    };
 
 // :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // :::::::::::::::::::::::::::::::::::::::::::::::::::::::: inline methods :::
@@ -45,7 +45,7 @@ namespace EmbySystem
         return m_code;
     }
 
-    inline EmbyLibs::String const&  ErrorCode::getDescription() const
+    inline EmbyLibs::String const &ErrorCode::getDescription() const
     {
         return m_description;
     }
