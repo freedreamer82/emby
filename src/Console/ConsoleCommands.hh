@@ -1,7 +1,7 @@
 #ifndef CONSOLE_COMMANDS_HH
 #define CONSOLE_COMMANDS_HH
 
-#include "EmbyConsole/Console.hh"
+#include <EmbyConsole/Console.hh>
 
 #define CONSOLE_CMD_HANDLER(name)                    \
     EmbyConsole::CommandErrorCode cmdHandler_##name( \

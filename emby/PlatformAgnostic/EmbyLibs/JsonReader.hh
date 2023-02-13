@@ -1,6 +1,3 @@
-// jRead.h
-// author: Marco Garzola
-//
 #ifndef JREAD_H
 #define JREAD_H
 
@@ -9,6 +6,7 @@
 #include <stdio.h>
 
 /*
+ * based on the work https://www.codeproject.com/Articles/887604/jWrite-A-Really-Simple-JSON-Writer-in-C
  * Examples:
   {
     "astring":"This is a string",
@@ -85,182 +83,192 @@ JsonReader::get().read(test, "{'myobj' {'key2'", &result);
 //    the returned pValue pointer points into the passed JSON
 //    string returns are not '\0' terminated.
 //    bytelen specifies the length of the returned data pointed to by pValue
-//
-
-class JsonReader
+// Original JsonWriter in C: TonyWilk, Mar 2015
+// This C++ version: TonyWilk, Mar 2018
+namespace EmbyLibs
 {
-public:
-    enum class dataType : uint8_t
+
+    class JsonReader
     {
-        Error,
-        Object,     // "{"
-        Array,      // "["
-        String,     // "string"
-        Number,     // number (may be -ve) int or float
-        Bool,       // true or false
-        Null,       // null
-        Key,        // object "key"
-        Colon,      // ":"
-        Eol,        // end of input string (ptr at '\0')
-        Comma,      // ","
-        EndObject,  // "}"
-        EndArray,   // "]"
-        QueryParams // "*" query string parameter
+    public:
+        enum class dataType : uint8_t
+        {
+            Error,
+            Object,     // "{"
+            Array,      // "["
+            String,     // "string"
+            Number,     // number (may be -ve) int or float
+            Bool,       // true or false
+            Null,       // null
+            Key,        // object "key"
+            Colon,      // ":"
+            Eol,        // end of input string (ptr at '\0')
+            Comma,      // ","
+            EndObject,  // "}"
+            EndArray,   // "]"
+            QueryParams // "*" query string parameter
+        };
+
+        enum class Error : uint8_t
+        {
+            Ok,                           // 0
+            NotMatchQuery,                // 1
+            ErrorReadingValue,            // 2
+            ExpectedKey,                  // 3
+            ExpectedColon,                // 4
+            ObjectKeyNotFound,            // 5
+            ExpectedComma,                // 6
+            TerminalFoundBeforeEndQuery,  // 7
+            UnexpectedCharacter,          // 8
+            ExpectedCommaInArray,         // 9
+            ArrayElementNotFoundBadIndex, // 10
+            ObjectKeyNotFoundBadIndex,    // 11
+            BadObjectKey,                 // 12
+            EndOfArrayFound,              // 13
+            EndOfObjectFound,             // 14
+            UnknownError                  // 15
+        };
+
+        static JsonReader &get();
+
+        struct jReadElement
+        {
+            JsonReader::dataType dataType; // one of JREAD_...
+            int16_t elements; // number of elements (e.g. elements in array or object)
+            int bytelen; // byte length of element (e.g. length of string, array text "[ ... ]" etc.)
+            const char *pValue; // pointer to value string in JSON text
+            JsonReader::Error error;  // error value if dataType == JREAD_ERROR
+        };
+
+        bool hasValue(const char *pJson, const char *pQuery);
+
+        //------------------------------------------------------
+        // The JSON reader function
+        //
+        // - reads a '\0'-terminated JSON text string from pJson
+        // - traverses the JSON according to the pQuery string
+        // - returns the result value in pResult
+        //
+        // returns: pointer into pJson after the queried value
+        //
+        // e.g.
+        //    With JSON like: "{ ..., "key":"value", ... }"
+        //
+        //    jRead( pJson, "{'key'", &result );
+        // returns with:
+        //    result.dataType= JREAD_STRING, result.pValue->'value', result.bytelen=5
+        //
+        const char *read(const char *pJson, const char *pQuery, struct jReadElement *pResult);
+
+        // version of jRead which allows one or more queryParam integers to be substituted
+        // for array or object indexes marked by a '*' in the query
+        //
+        // e.g. jReadParam( pJson, "[*", &resultElement, &arrayIndex );
+        //
+        // *!* CAUTION *!*
+        // You can supply an array of integers which are indexed for each '*' in pQuery
+        // however, horrid things will happen if you don't supply enough parameters
+        //
+        const char *readParam(const char *pJson,
+                              const char *pQuery,
+                              struct jReadElement *pResult,
+                              int *queryParams);
+
+        // Array Stepping function
+        // - assumes pJsonArray is JSON source of an array "[ ... ]"
+        // - returns next element of the array in pResult
+        // - returns pointer to end of element, to be passed to next call of jReadArrayStep()
+        // - if end of array is encountered, pResult->error = 13 "End of array found"
+        //
+        // e.g.
+        //   With JSON like:   "{ ...  "arrayInObject":[ elem1,elem2,... ], ... }"
+        //
+        //   pJson= jRead( pJson, "{'arrayInObject'", &theArray );
+        //   if( theArray.dataType == JREAD_ARRAY )
+        //   {
+        //       char *pArray= (char *)theArray.pValue;
+        //       jReadElement arrayElement;
+        //       int index;
+        //       for( index=0; index < theArray.elements; index++ )
+        //       {
+        //           pArray= jReadArrayStep( pArray, &arrayElement );
+        //           ...
+        //
+        // Note: this significantly speeds up traversing arrays.
+        //
+        const char *readArrayStep(const char *pJsonArray, struct jReadElement *pResult);
+
+        //------------------------------------------------------
+        // Optional Helper Functions
+        //
+        long read_long(const char *pJson, const char *pQuery, int *queryParams = NULL);
+
+        int read_int(const char *pJson, const char *pQuery, int *queryParams = NULL);
+
+        float read_float(const char *pJson, const char *pQuery, int *queryParams = NULL);
+
+        int read_string(
+                const char *pJson, const char *pQuery, char *pDest, int destlen, int *queryParams = NULL);
+
+        //------------------------------------------------------
+        // Optional String output Functions
+        //
+        char *readTypeMessage(char *destBuffer,
+                              int destLength,
+                              int datatype); // get string describing data type
+        char *readErrorMessage(char *destBuffer,
+                               int destLength,
+                               int error); // get string describing error code
+
+        // copy element to '\0'-terminated buffer
+        int strcpy(char *destBuffer, int destLength, struct jReadElement *pElement);
+
+        // jReadCountArray
+        // - used when query ends at an array, we want to return the array length
+        // - on entry pJson -> "[... "
+        // - used to skip unwanted values which are arrays
+        //
+        const char *readCountArray(const char *pJson, struct JsonReader::jReadElement *pResult);
+
+
+        // readCountObject
+        // - used when query ends at an object, we want to return the object length
+        // - on entry pJson -> "{... "
+        // - used to skip unwanted values which are objects
+        // - keyIndex normally passed as -1 unless we're looking for the nth "key" value
+        //   in which case keyIndex is the index of the key we want
+        //
+        const char *
+        readCountObject(const char *pJson, struct JsonReader::jReadElement *pResult, int keyIndex);
+
+        // jReadTextLen
+        // - used to identify length of element text
+        // - returns no. of chars from pJson upto a terminator
+        // - terminators: ' ' , } ]
+        //
+        int readTextLen(const char *pJson);
+
+    private:
+        const char *jReadSkipWhitespace(const char *sp);
+
+        const char *jReadFindTok(const char *sp, JsonReader::dataType *tokType);
+
+        const char *
+        jReadGetString(const char *pJson, struct JsonReader::jReadElement *pElem, char quote);
+
+
+        //------------------------------------------------------
+        // Other jRead utilities which may be useful...
+        //
+        const char *jRead_atoi(const char *p, unsigned int *result); // string to unsigned int
+        const char *jRead_atol(const char *p, long *result);         // string to signed long
+        const char *jRead_atof(const char *p,
+                               float *result); // string to float (does not do exponents)
+        int jReadStrcmp(struct jReadElement *j1,
+                        struct jReadElement *j2); // compare STRING elements
     };
-
-    enum class Error : uint8_t
-    {
-        Ok,                           // 0
-        NotMatchQuery,                // 1
-        ErrorReadingValue,            // 2
-        ExpectedKey,                  // 3
-        ExpectedColon,                // 4
-        ObjectKeyNotFound,            // 5
-        ExpectedComma,                // 6
-        TerminalFoundBeforeEndQuery,  // 7
-        UnexpectedCharacter,          // 8
-        ExpectedCommaInArray,         // 9
-        ArrayElementNotFoundBadIndex, // 10
-        ObjectKeyNotFoundBadIndex,    // 11
-        BadObjectKey,                 // 12
-        EndOfArrayFound,              // 13
-        EndOfObjectFound,             // 14
-        UnknownError                  // 15
-    };
-
-    static JsonReader& get();
-
-    struct jReadElement
-    {
-        JsonReader::dataType dataType; // one of JREAD_...
-        int16_t              elements; // number of elements (e.g. elements in array or object)
-        int bytelen; // byte length of element (e.g. length of string, array text "[ ... ]" etc.)
-        const char*       pValue; // pointer to value string in JSON text
-        JsonReader::Error error;  // error value if dataType == JREAD_ERROR
-    };
-
-    bool hasValue(const char* pJson, const char* pQuery);
-
-    //------------------------------------------------------
-    // The JSON reader function
-    //
-    // - reads a '\0'-terminated JSON text string from pJson
-    // - traverses the JSON according to the pQuery string
-    // - returns the result value in pResult
-    //
-    // returns: pointer into pJson after the queried value
-    //
-    // e.g.
-    //    With JSON like: "{ ..., "key":"value", ... }"
-    //
-    //    jRead( pJson, "{'key'", &result );
-    // returns with:
-    //    result.dataType= JREAD_STRING, result.pValue->'value', result.bytelen=5
-    //
-    const char* read(const char* pJson, const char* pQuery, struct jReadElement* pResult);
-
-    // version of jRead which allows one or more queryParam integers to be substituted
-    // for array or object indexes marked by a '*' in the query
-    //
-    // e.g. jReadParam( pJson, "[*", &resultElement, &arrayIndex );
-    //
-    // *!* CAUTION *!*
-    // You can supply an array of integers which are indexed for each '*' in pQuery
-    // however, horrid things will happen if you don't supply enough parameters
-    //
-    const char* readParam(const char*          pJson,
-                          const char*          pQuery,
-                          struct jReadElement* pResult,
-                          int*                 queryParams);
-
-    // Array Stepping function
-    // - assumes pJsonArray is JSON source of an array "[ ... ]"
-    // - returns next element of the array in pResult
-    // - returns pointer to end of element, to be passed to next call of jReadArrayStep()
-    // - if end of array is encountered, pResult->error = 13 "End of array found"
-    //
-    // e.g.
-    //   With JSON like:   "{ ...  "arrayInObject":[ elem1,elem2,... ], ... }"
-    //
-    //   pJson= jRead( pJson, "{'arrayInObject'", &theArray );
-    //   if( theArray.dataType == JREAD_ARRAY )
-    //   {
-    //       char *pArray= (char *)theArray.pValue;
-    //       jReadElement arrayElement;
-    //       int index;
-    //       for( index=0; index < theArray.elements; index++ )
-    //       {
-    //           pArray= jReadArrayStep( pArray, &arrayElement );
-    //           ...
-    //
-    // Note: this significantly speeds up traversing arrays.
-    //
-    const char* readArrayStep(const char* pJsonArray, struct jReadElement* pResult);
-
-    //------------------------------------------------------
-    // Optional Helper Functions
-    //
-    long  read_long(const char* pJson, const char* pQuery, int* queryParams = NULL);
-    int   read_int(const char* pJson, const char* pQuery, int* queryParams = NULL);
-    float read_float(const char* pJson, const char* pQuery, int* queryParams = NULL);
-    int   read_string(
-            const char* pJson, const char* pQuery, char* pDest, int destlen, int* queryParams = NULL);
-
-    //------------------------------------------------------
-    // Optional String output Functions
-    //
-    char* readTypeMessage(char* destBuffer,
-                          int   destLength,
-                          int   datatype); // get string describing data type
-    char* readErrorMessage(char* destBuffer,
-                           int   destLength,
-                           int   error); // get string describing error code
-
-    // copy element to '\0'-terminated buffer
-    int strcpy(char* destBuffer, int destLength, struct jReadElement* pElement);
-
-    // jReadCountArray
-    // - used when query ends at an array, we want to return the array length
-    // - on entry pJson -> "[... "
-    // - used to skip unwanted values which are arrays
-    //
-    const char* readCountArray(const char* pJson, struct JsonReader::jReadElement* pResult);
-
-
-    // readCountObject
-    // - used when query ends at an object, we want to return the object length
-    // - on entry pJson -> "{... "
-    // - used to skip unwanted values which are objects
-    // - keyIndex normally passed as -1 unless we're looking for the nth "key" value
-    //   in which case keyIndex is the index of the key we want
-    //
-    const char*
-    readCountObject(const char* pJson, struct JsonReader::jReadElement* pResult, int keyIndex);
-
-    // jReadTextLen
-    // - used to identify length of element text
-    // - returns no. of chars from pJson upto a terminator
-    // - terminators: ' ' , } ]
-    //
-    int readTextLen(const char* pJson);
-private:
-    const char* jReadSkipWhitespace(const char* sp);
-    const char* jReadFindTok(const char* sp, JsonReader::dataType* tokType);
-    const char*
-    jReadGetString(const char* pJson, struct JsonReader::jReadElement* pElem, char quote);
-
-
-    //------------------------------------------------------
-    // Other jRead utilities which may be useful...
-    //
-    const char* jRead_atoi(const char* p, unsigned int* result); // string to unsigned int
-    const char* jRead_atol(const char* p, long* result);         // string to signed long
-    const char* jRead_atof(const char* p,
-                           float*      result); // string to float (does not do exponents)
-    int         jReadStrcmp(struct jReadElement* j1,
-                            struct jReadElement* j2); // compare STRING elements
-};
 
 // end of jRead.h
+}
 
 #endif /* JREAD_H */
