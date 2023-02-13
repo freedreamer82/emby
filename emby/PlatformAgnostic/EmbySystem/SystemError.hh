@@ -17,7 +17,7 @@
 
 
 #ifndef EMBY_CFG_SYSTEM_ERROR_BUFFER_SIZE
-#define   EMBY_CFG_SYSTEM_ERROR_BUFFER_SIZE  10
+#define   EMBY_CFG_SYSTEM_ERROR_BUFFER_SIZE  5
 #endif
 
 namespace EmbySystem

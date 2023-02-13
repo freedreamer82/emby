@@ -39,6 +39,8 @@ embyconfig["EMBY_CFG_CONSOLE_COMMAND_BUFF_SIZE"]=80
 embyconfig["EMBY_CFG_CONSOLE_LOGIN_ROOT_PSW"]="root"
 embyconfig["EMBY_CFG_CONSOLE_LOGIN_GUEST_PSW"]="guest"
 embyconfig["EMBY_CFG_CONSOLE_USER_LOGIN_TIMEOUT_SEC"]=3
+#
+embyconfig["EMBY_CFG_SYSTEM_ERROR_BUFFER_SIZE"]=5
 
 #hashmap["key"]="value"
 #hashmap["key2"]="value2"
@@ -143,6 +145,24 @@ function show_console() {
   esac
 }
 
+function show_system() {
+
+  dialog --backtitle "$BACKTITLE" \
+    --title "[ EMBY SYSTEM ]" \
+    --clear \
+    --menu "" 15 50 4 \
+    "Error Pool Size" "${embyconfig["EMBY_CFG_SYSTEM_ERROR_BUFFER_SIZE"]}" 2>"${INPUT}"
+
+  menuitem=$(<"${INPUT}")
+
+  case $menuitem in
+  "Error Pool Size") change_value_popup EMBY_CFG_SYSTEM_ERROR_BUFFER_SIZE ;;
+  *)
+    echo "???"
+    ;;
+  esac
+
+}
 function show_strings() {
 
   dialog --backtitle "$BACKTITLE" \
@@ -179,8 +199,9 @@ while true; do
     --menu "You can use the UP/DOWN arrow keys, the first \n\
 letter of the choice as a hot key, or the \n\
 number keys 1-9 to choose an option.\n\
-Choose the TASK" 15 50 4 \
+Choose the TASK" 18 70 4 \
     Strings "Strings config" \
+    System "System config" \
     Console "Console config" \
     Containers "Containers config" \
     "Save Config" "Export Configuration in a file" \
@@ -191,6 +212,7 @@ Choose the TASK" 15 50 4 \
   # make decsion
   case $menuitem in
   Strings) show_strings ;;
+  System) show_system ;;
   Console) show_console ;;
   Containers) show_container ;;
   "Save Config") save_config_file ;;
