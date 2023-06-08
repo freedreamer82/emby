@@ -1,12 +1,3 @@
-/**
- * @addtogroup Application
- * @{
- * @file ConsoleWorker.hh
- * @author Massimiliano Pagani
- * @version 1.0
- * @date 19/12/2014
- *
- */
 
 #if !defined( CONSOLEWORKER_HH )
 #define CONSOLEWORKER_HH
@@ -16,46 +7,57 @@
 #include <EmbyThreading/Thread.hh>
 #include <vector>
 
+
+#ifndef EMBY_CFG_CONSOLE_THREAD_STACK_SIZE
+#define     EMBY_CFG_CONSOLE_THREAD_STACK_SIZE   500
+#endif
+
+
 /** 
  * ConsoleWorker is the thread for handling console.
  */
 
 class ConsoleWorker : public EmbyThreading::Worker
 {
-	public:
+public:
 
 
-                bool isRegistered(EmbyConsole::Console* console);
-		bool addConsole( EmbyConsole::Console* console);
-		bool removeConsole( EmbyConsole::Console* console);
-		/**
-		 * @{
-		 * Singleton methods.NOT inherited from EmbySigleton to avoid multiple inheritance
-		 */
-		static ConsoleWorker& get();
+    bool isRegistered(EmbyConsole::Console *console);
 
-		bool start()
-		{
-		    return m_thread.start();
-		}
+    bool addConsole(EmbyConsole::Console *console);
 
-	private:
+    bool removeConsole(EmbyConsole::Console *console);
 
+    /**
+     * @{
+     * Singleton methods.NOT inherited from EmbySigleton to avoid multiple inheritance
+     */
+    static ConsoleWorker &get();
 
-		static size_t const STACK_SIZE	 	= 500;
-		static int    const PRIORITY        =  EmbyThreading::PRIORITY_LOWEST;
+    bool start()
+    {
+        return m_thread.start();
+    }
 
-		ConsoleWorker( ConsoleWorker const& copy );
-		ConsoleWorker& operator=( ConsoleWorker const& copy );
-		EmbyThreading::Thread 				 m_thread;
+private:
 
-	protected:
+    static EmbyThreading::Thread::Priority const PRIORITY = EmbyThreading::Thread::Priority::VeryLow;
 
-		std::vector<EmbyConsole::Console*>   m_consoles;
-		virtual void doWork();
+    ConsoleWorker(ConsoleWorker const &copy);
 
-		ConsoleWorker();
-		virtual ~ConsoleWorker();
+    ConsoleWorker &operator=(ConsoleWorker const &copy);
+
+    EmbyThreading::Thread m_thread;
+
+protected:
+
+    std::vector<EmbyConsole::Console *> m_consoles;
+
+    virtual void doWork();
+
+    ConsoleWorker();
+
+    virtual ~ConsoleWorker();
 };
 
 #endif

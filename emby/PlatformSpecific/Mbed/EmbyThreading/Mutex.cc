@@ -5,10 +5,10 @@
 
 namespace EmbyThreading
 {
-    Mutex::Mutex(Type type) 
+    Mutex::Mutex(Type type)
     {
 
-        (void)type;
+        (void) type;
     }
 
     void Mutex::release()

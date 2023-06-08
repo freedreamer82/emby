@@ -11,10 +11,30 @@ namespace EmbyThreading
 		instance->run();
 	}
 
+    static int getPrio(EmbyThreading::Thread::Priority priority)
+    {
+        switch (priority)
+        {
+            case EmbyThreading::Thread::Priority::VeryHigh:
+                return  configMAX_PRIORITIES - 1;
+            case EmbyThreading::Thread::Priority::High:
+                return  configMAX_PRIORITIES - 2;
+            case EmbyThreading::Thread::Priority::Normal:
+                return  configMAX_PRIORITIES - 3;
+            case EmbyThreading::Thread::Priority::Low:
+                return  configMAX_PRIORITIES - 4;
+            case EmbyThreading::Thread::Priority::VeryLow:
+                return  configMAX_PRIORITIES - 5;
+        }
+
+        return configMAX_PRIORITIES - 3;;
+    }
+
+
     Thread::Thread( EmbyThreading::Worker* worker,
     			    char const* name,
     			    size_t stackSize,
-    			    int priority , bool start,uint32_t *stack)
+                    Priority priority , bool start,uint32_t *stack)
 	{
 
     	EmbyDebug_ASSERT_CHECK_NULL_PTR(worker);
@@ -23,7 +43,7 @@ namespace EmbyThreading
 		BaseType_t retval = xTaskCreate( launcher,
 				 	 	 	 	 	 	 name,stackSize,
 				 	 	 	 	 	 	 this,
-				 	 	 	 	 	 	 priority,
+                                         getPrio(priority),
 				 	 	 	 	 	 	 &m_impl.m_handle );
 		EmbyDebug_ASSERT( retval == pdPASS );
 		EmbyDebug_ASSERT_CHECK_NULL_PTR(m_impl.m_handle);

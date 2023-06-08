@@ -81,7 +81,7 @@ namespace EmbyExec
 
 		private:
 			static size_t const STACK_SIZE = 900;
-			static int const PRIORITY = EmbyThreading::PRIORITY_LOWEST;
+            static auto const PRIORITY =  EmbyThreading::Thread::Priority::VeryLow;
 
 			struct SenderMessagePair
 			{

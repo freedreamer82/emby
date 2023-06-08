@@ -14,7 +14,7 @@ namespace EmbyThreading
     Thread::Thread( Worker* worker,
                     char const* name,
                     size_t stackSize,
-                    int priority , bool start ,
+                    Priority  priority , bool start ,
                     uint32_t * stack )
 	{
     	(void)stackSize;

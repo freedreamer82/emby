@@ -7,3 +7,4 @@
 #define  EMBY_CFG_STRING_LONG_POOL_SIZE                      10        
 #define  EMBY_CFG_STRING_MEDIUM_POOL_SIZE                    15        
 #define  EMBY_CFG_STRING_SHORT_POOL_SIZE                     60        
+#define  EMBY_CFG_CONSOLE_THREAD_STACK_SIZE                  500

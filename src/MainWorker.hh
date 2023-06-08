@@ -23,11 +23,10 @@ private:
     bool onErrors( EmbySystem::ErrorCode *err, EmbySystem::SystemError::Status status);
 
     static size_t const STACK_SIZE = 600;
-    static int const PRIORITY = EmbyThreading::PRIORITY_LOWEST;
+    static auto const PRIORITY =  EmbyThreading::Thread::Priority::Normal;
 
     EmbyThreading::Thread m_thread;
 };
-
 #endif
 ///@}
 

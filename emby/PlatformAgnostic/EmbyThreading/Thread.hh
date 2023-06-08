@@ -1,12 +1,3 @@
-/**
- * @addtogroup Thread
- * @{
- * @file EMBYMutex/Thread.hh
- * @author Garzola Marco
- * @version 1.0
- * @date 11/10/2014
- *
- */
 
 #if !defined( EMBY_EMBYTHREAD_HH )
 #define EMBY_EMBYTHREAD_HH
@@ -22,11 +13,19 @@ namespace EmbyThreading
     class Thread
     {
     public:
+        enum class Priority : uint8_t
+        {
+            VeryHigh,
+            High,
+            Normal,
+            Low,
+            VeryLow,
+        };
 
         Thread(EmbyThreading::Worker *worker,
                char const *name,
                size_t stackSize,
-               int priority, bool start = true,
+               Priority priority, bool start = true,
                uint32_t *stack = nullptr);
 
         /**

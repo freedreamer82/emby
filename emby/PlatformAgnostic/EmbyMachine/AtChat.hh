@@ -131,7 +131,7 @@ protected:
     virtual void flush() = 0;
 
     static size_t const STACK_SIZE = 400;
-    static int const PRIORITY = EmbyThreading::PRIORITY_LOWEST;
+    static auto const PRIORITY =  EmbyThreading::Thread::Priority::VeryLow;
 
     AtChat &operator=(AtChat const &copy);
 

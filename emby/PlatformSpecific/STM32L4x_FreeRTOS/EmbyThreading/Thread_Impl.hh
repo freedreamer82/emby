@@ -6,8 +6,7 @@
 
 namespace EmbyThreading
 {
-	static int constexpr  PRIORITY_LOWEST = tskIDLE_PRIORITY;
-    static int constexpr PRIORITY_HIGHEST =  configMAX_PRIORITIES -1;
+
 	struct ThreadImpl
 	{
 		TaskHandle_t  m_handle;

@@ -10,7 +10,6 @@
 
 namespace EmbyThreading
 {
-    static int constexpr PRIORITY_LOWEST  =  -1;
 
 	struct ThreadImpl
 	{

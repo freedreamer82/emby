@@ -39,6 +39,8 @@ embyconfig["EMBY_CFG_CONSOLE_COMMAND_BUFF_SIZE"]=80
 embyconfig["EMBY_CFG_CONSOLE_LOGIN_ROOT_PSW"]="root"
 embyconfig["EMBY_CFG_CONSOLE_LOGIN_GUEST_PSW"]="guest"
 embyconfig["EMBY_CFG_CONSOLE_USER_LOGIN_TIMEOUT_SEC"]=3
+embyconfig["EMBY_CFG_CONSOLE_THREAD_STACK_SIZE"]=500
+
 #
 embyconfig["EMBY_CFG_SYSTEM_ERROR_BUFFER_SIZE"]=5
 
@@ -129,6 +131,7 @@ function show_console() {
     "Root Password" "${embyconfig["EMBY_CFG_CONSOLE_LOGIN_ROOT_PSW"]}" \
     "Guest Password" "${embyconfig["EMBY_CFG_CONSOLE_LOGIN_GUEST_PSW"]}" \
     "Login Timeout Seconds" "${embyconfig["EMBY_CFG_CONSOLE_USER_LOGIN_TIMEOUT_SEC"]}" \
+     "Console thread stack size" "${embyconfig["EMBY_CFG_CONSOLE_THREAD_STACK_SIZE"]}" \
     2>"${INPUT}"
 
   menuitem=$(<"${INPUT}")
