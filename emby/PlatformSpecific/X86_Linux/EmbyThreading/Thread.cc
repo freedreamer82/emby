@@ -22,20 +22,23 @@ namespace EmbyThreading
     	(void)priority;
     	EmbyDebug_ASSERT_CHECK_NULL_PTR(worker);
 		m_worker    = worker;
-        m_isRunning = start;
+                m_isRunning = start;
 		int retval = pthread_create( &m_impl.m_handle ,  nullptr, launcher , this);
 		EmbyDebug_ASSERT( retval == 0 );
 	}
 
-    void
+    bool
     Thread::start()
     {
         m_isRunning = true;
+	return m_isRunning;    
     }
-    void
+
+    bool
     Thread::pause()
     {
         m_isRunning = false;
+	return m_isRunning;    
     }
 
 
