@@ -1,5 +1,5 @@
 to build x86:
-cmake -DEMBY_FOLDER=$PWD/emby  -DEMBY_CONFIG=src/emby_config.h -DEMBY_PLATFORM=X86_Linux .
+cmake -DEMBY_FOLDER=$PWD/emby  -DEMBY_CONFIG=src/emby_config.h -DEMBY_PLATFORM=X86_Unix .
 
 to build for arm:
 
