@@ -14,7 +14,7 @@ namespace EmbyThreading
     Thread::Thread( Worker* worker,
                     char const* name,
                     size_t stackSize,
-                    Priority  priority , bool start ,
+                    Priority  priority , bool start,
                     uint32_t * stack )
 	{
     	(void)stackSize;
@@ -22,7 +22,7 @@ namespace EmbyThreading
     	(void)priority;
     	EmbyDebug_ASSERT_CHECK_NULL_PTR(worker);
 		m_worker    = worker;
-		m_isRunning = true;
+                m_isRunning = start;
 		int retval = pthread_create( &m_impl.m_handle ,  nullptr, launcher , this);
 		EmbyDebug_ASSERT( retval == 0 );
 	}
@@ -30,8 +30,17 @@ namespace EmbyThreading
     bool
     Thread::start()
     {
-    	return true;
+        m_isRunning = true;
+	return true;    
     }
+
+    bool
+    Thread::pause()
+    {
+        m_isRunning = false;
+	return true;    
+    }
+
 
     void
     Thread::yield()
@@ -47,9 +56,15 @@ namespace EmbyThreading
 
     void Thread::run()
     {
-        while(m_isRunning)
+        while(1)
         {
-            m_worker->doWork();
+            if (m_isRunning){
+                m_worker->doWork();
+            }
+            else{
+                EmbySystem::delayMs(100);
+            }
+
         }
     }
 
