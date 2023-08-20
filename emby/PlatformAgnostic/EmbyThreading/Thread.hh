@@ -32,10 +32,10 @@ namespace EmbyThreading
          * Acquire Mutex lock
          *
          */
-        void
+        bool
         start();
 
-        void
+        bool
         pause();
 
         /**
