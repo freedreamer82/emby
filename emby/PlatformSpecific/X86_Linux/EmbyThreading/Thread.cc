@@ -31,14 +31,14 @@ namespace EmbyThreading
     Thread::start()
     {
         m_isRunning = true;
-	return m_isRunning;    
+	return true;    
     }
 
     bool
     Thread::pause()
     {
         m_isRunning = false;
-	return m_isRunning;    
+	return true;    
     }
 
 
