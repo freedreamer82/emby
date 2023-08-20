@@ -8,27 +8,25 @@ message("${CMAKE_BUILD_TYPE}")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 
-## specify cross compilers and tools
-#set(CMAKE_C_COMPILER arm-none-eabi-gcc)
-#set(CMAKE_CXX_COMPILER arm-none-eabi-g++)
-#set(CMAKE_ASM_COMPILER arm-none-eabi-gcc)
-#set(CMAKE_AR arm-none-eabi-ar)
-#set(CMAKE_OBJCOPY arm-none-eabi-objcopy)
-#set(CMAKE_OBJDUMP arm-none-eabi-objdump)
-#set(SIZE arm-none-eabi-size)
-#set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
-#
+set(EMBY_FOLDER ../../../)
+set(EMBY_PLATFORM X86_Unix)
 
-#Uncomment for hardware floating point
-#add_compile_definitions(ARM_MATH_CM4;ARM_MATH_MATRIX_CHECK;ARM_MATH_ROUNDING)
+if (EMBY_FOLDER)
+    message(STATUS "including EMBY cmake:" ${EMBY_FOLDER}/emby.cmake)
+    set(ENV{EMBY_FOLDER} ["${EMBY_FOLDER}"])
+    include("${EMBY_FOLDER}/emby.cmake")
+endif()
+ 
 
-#set(COMPILE_OPTS -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mthumb -mfloat-abi=hard )
 add_compile_options(-Os -g)
 add_compile_options("${COMPILE_OPTS}")
 add_link_options("${COMPILE_OPTS}")
 set(CMAKE_EXE_LINKER_FLAGS  "${COMPILE_OPTS}")
 
-add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0 -fsingle-precision-constant -Werror=return-type)
+if(!APPLE)
+   add_compile_options(-fsingle-precision-constant)
+endif()
+add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0  -Werror=return-type)
 
 # uncomment to mitigate c++17 absolute addresses warnings
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-register -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics ")
@@ -48,16 +46,16 @@ message(STATUS ${ROOT_DIR})
 message(STATUS ${PROJECT_SOURCE_DIR})
 
 include_directories( ${ROOT_DIR}/PlatformAgnostic/
-        ${ROOT_DIR}/PlatformSpecific/x86_Linux/EmbySystem/
-        ${ROOT_DIR}/PlatformSpecific/x86_Linux/EmbyThreading)
+        ${ROOT_DIR}/PlatformSpecific/X86_Unix/EmbySystem/
+        ${ROOT_DIR}/PlatformSpecific/X86_Unix/EmbyThreading)
 
 #project def goes AFTER TOOLCHAIN SETUP!!!! otherwise doesn't recognize correctly gcc
 project(test-string CXX ASM)
 
 file(GLOB_RECURSE SOURCES
         "Test_String.cc"
-        "${ROOT_DIR}/PlatformSpecific/x86_Linux/EmbyThreading/Mutex.cc"
-        "${ROOT_DIR}/PlatformSpecific/x86_Linux/EmbySystem/System.cc"
+        "${ROOT_DIR}/PlatformSpecific/X86_Unix/EmbyThreading/Mutex.cc"
+        "${ROOT_DIR}/PlatformSpecific/X86_Unix/EmbySystem/System.cc"
         "${ROOT_DIR}/PlatformAgnostic/EmbyLibs/String.cc"
         "${ROOT_DIR}/PlatformAgnostic/EmbyLibs/StringUtils.cc"
         "${ROOT_DIR}/PlatformAgnostic/EmbyLibs/OutputFormatter.cc")
@@ -79,4 +77,4 @@ function(show_object_size target)
 endfunction()
 
 #message(STATUS "${SOURCES}")
-show_object_size(${PROJECT_NAME})
+#show_object_size(${PROJECT_NAME})

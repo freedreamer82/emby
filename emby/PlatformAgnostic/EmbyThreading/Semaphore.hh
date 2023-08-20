@@ -1,11 +1,3 @@
-/**
- * @addtogroup EmbyThreading
- * @{
- * @file EmbyThreading/Semaphore.hh
- * @author apagani
- * @version 1.0
- * @date Jan 28, 2015
- */
 
 #ifndef EMBY_THREADING_SEMAPHORE_HH_
 #define EMBY_THREADING_SEMAPHORE_HH_

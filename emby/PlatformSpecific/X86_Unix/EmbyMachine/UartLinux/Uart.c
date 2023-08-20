@@ -1,20 +1,3 @@
-/*------------------- (C) COPYRIGHT 2009 MR&D Institute ----------------------*/
-/**
- * @file Uart.c
- *
- * @brief <brief description>
- *
- * <detailed description, on one or more rows>
- *
- * @author Garzola Marco
- * @version 0.1
- * @date 27-11-2012
- * @note <description note>
- *
- */
-
-/* Includes ------------------------------------------------------------------*/
-
 #include "Uart.h"
 #include "Uart_Config.h"
 #include "Uart_Impl.h"
@@ -417,7 +400,7 @@ Uart_inWaiting(Uart* self)
 {
     Debug_ASSERT(self!=NULL);
     int size;
-    int retval = ioctl(self->impl.fd, TIOCINQ , &size);
+    int retval = ioctl(self->impl.fd, FIONREAD , &size);
     return  retval >= 0 ? size : 0;
 }
 

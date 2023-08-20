@@ -1,5 +1,8 @@
 #include "JsonWriter.hh"
 #include <EmbyLibs/StringUtils.hh>
+#include <cstdio>
+
+
 namespace EmbyLibs
 {
 //------------------------------------------

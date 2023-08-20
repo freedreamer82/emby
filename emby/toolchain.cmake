@@ -1,6 +1,11 @@
 # this one is important
-SET(CMAKE_SYSTEM_NAME Linux)
-#this one not so much
+if(LINUX)
+    SET(CMAKE_SYSTEM_NAME Linux)
+elif(APPLE) 
+    SET(CMAKE_SYSTEM_NAME Darwin)
+endif()
+
+    #this one not so much
 SET(CMAKE_SYSTEM_VERSION 1)
 
 set(TOOLCHAIN_PATH $ENV{CUSTOM_GCC_TOOLCHAIN_PATH})

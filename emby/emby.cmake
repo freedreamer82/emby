@@ -29,7 +29,12 @@ endif ()
 include("${EMBY_FOLDER}/toolchain.cmake")
 
 add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
-add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0 -fsingle-precision-constant -Werror=return-type)
+
+if(!APPLE)
+  add_compile_options(-fsingle-precision-constant)
+endif()
+
+add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0 -Werror=return-type)
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     message(STATUS "Maximum optimization for size , no DEBUG")

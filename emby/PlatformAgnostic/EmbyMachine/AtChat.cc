@@ -242,7 +242,7 @@ AtChat::cmdProcessor(String &cmd, AtCommandParser *parser, size_t timeoutMs, boo
                 /**Outside AT cmd*/
 //#warning "if I compare the whole string sometimes it fail...do we miss chars????? fix ME!!"
                 //	if( doesStringBeginWith(reply,cmd) )
-                if (reply.find(cmd) != std::string::npos)
+                if (reply.find(cmd) != String::npos)
                     //	if (reply.compare(0, cmd.length()/2, cmd ))
                 {
                     /**Is an echo*/

@@ -8,6 +8,15 @@ message("${CMAKE_BUILD_TYPE}")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 
+set(EMBY_FOLDER ../../../)
+set(EMBY_PLATFORM X86_Unix)
+
+if (EMBY_FOLDER)
+    message(STATUS "including EMBY cmake:" ${EMBY_FOLDER}/emby.cmake)
+    set(ENV{EMBY_FOLDER} ["${EMBY_FOLDER}"])
+    include("${EMBY_FOLDER}/emby.cmake")
+endif()
+
 ## specify cross compilers and tools
 #set(CMAKE_C_COMPILER arm-none-eabi-gcc)
 #set(CMAKE_CXX_COMPILER arm-none-eabi-g++)
@@ -28,7 +37,10 @@ add_compile_options("${COMPILE_OPTS}")
 add_link_options("${COMPILE_OPTS}")
 set(CMAKE_EXE_LINKER_FLAGS  "${COMPILE_OPTS}")
 
-add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0 -fsingle-precision-constant -Werror=return-type)
+if(!APPLE)
+   add_compile_options(-fsingle-precision-constant)
+endif()
+add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0  -Werror=return-type)
 
 # uncomment to mitigate c++17 absolute addresses warnings
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-register -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics ")
@@ -47,7 +59,7 @@ message(STATUS ${ROOT_DIR})
 
 message(STATUS ${PROJECT_SOURCE_DIR})
 
-include_directories( ${ROOT_DIR}/PlatformSpecific/x86_Linux/EmbySystem/
+include_directories( ${ROOT_DIR}/PlatformSpecific/X86_Unix/EmbySystem/
                      ${ROOT_DIR}/PlatformAgnostic/)
 
 #project def goes AFTER TOOLCHAIN SETUP!!!! otherwise doesn't recognize correctly gcc
@@ -55,7 +67,7 @@ project(test-buffer CXX ASM)
 
 file(GLOB_RECURSE SOURCES
         "Test_Buffer.cc"
-        "${ROOT_DIR}/PlatformSpecific/x86_Linux/EmbySystem/System.cc")
+        "${ROOT_DIR}/PlatformSpecific/X86_Unix/EmbySystem/System.cc")
 
 #add_link_options(-T ${LINKER_SCRIPT})
 #add_link_options(  -lc -lm -lnosys  )
@@ -75,4 +87,4 @@ function(show_object_size target)
     )
 endfunction()
 
-show_object_size(${PROJECT_NAME})
+#show_object_size(${PROJECT_NAME})

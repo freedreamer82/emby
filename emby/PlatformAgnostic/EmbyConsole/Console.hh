@@ -47,14 +47,22 @@ namespace EmbyConsole
 #define     EOL                                                                     "\r\n"
 
 
-// compares two strings in compile time constant fashion
+#ifdef __APPLE__
+  #ifndef EMBY_CFG_MAX_CONSOLE_PWD_SIZE
+    //on apple constexpr doesn t seem to work so if not defined the pwd size it will be set to a default size
+       #define EMBY_CFG_MAX_CONSOLE_PWD_SIZE  10
+  #endif
+#endif
+
+//check the max size of the root/guest anc add \r\n (2 bytes)
+#ifndef EMBY_CFG_MAX_CONSOLE_PWD_SIZE
+
+
+    // compares two strings in compile time constant fashion
     constexpr int getMaxPasswordLen(char const *guest, char const *root)
     {
         return strlen(root) > strlen(guest) ? strlen(root) + strlen(EOL) : strlen(guest) + strlen(EOL);
     }
-
-//check the max size of the root/guest anc add \r\n (2 bytes)
-#ifndef EMBY_CFG_MAX_CONSOLE_PWD_SIZE
 
     static constexpr int EMBY_CFG_MAX_CONSOLE_PWD_SIZE = getMaxPasswordLen(EMBY_CFG_CONSOLE_LOGIN_GUEST_PSW,
                                                                            EMBY_CFG_CONSOLE_LOGIN_ROOT_PSW);

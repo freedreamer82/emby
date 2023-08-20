@@ -7,29 +7,25 @@
 #include "Console/ConsoleCommands.hh"
 #include <EmbyLog/Log.hh>
 
-
 #ifdef EMBY_BUILD_X86
 #include "ConsoleTelnet.hh"
 #include <EmbyLog/StdLogProcessor.hh>
 #include <cstdio>
 #endif
 
-
 EmbyLog_MODULE_LOG_CLASS("main");
 
 using namespace EmbyLibs;
 using namespace EmbySystem;
 
-
 bool MainWorker::onErrors(EmbySystem::ErrorCode *err, EmbySystem::SystemError::Status status)
 {
-    log_error("This is fake error: @%d, %d ,%S",  err->getTime(),int(err->getCode()), err->getDescription());
+    auto error = err->getDescription();
+    log_error("This is fake error: @%d, %d ,%s", err->getTime(), int(err->getCode()), error.c_str());
     return false;
 }
 
-
-MainWorker::MainWorker() :
-        m_thread(this, "Main", STACK_SIZE, PRIORITY)
+MainWorker::MainWorker() : m_thread(this, "Main", STACK_SIZE, PRIORITY)
 {
     EmbySystem::SystemError::SystemErrorCallback cb;
     cb.attach(this, &MainWorker::onErrors);
@@ -38,7 +34,6 @@ MainWorker::MainWorker() :
 
 MainWorker::~MainWorker()
 {
-
 }
 
 [[noreturn]] void
@@ -46,7 +41,6 @@ MainWorker::doWork()
 {
 
 #ifdef EMBY_BUILD_ARM
-
 
     EmbyMachine::Serial::Serial_Config uartConfig;
     uartConfig.baudRate = EmbyMachine::Serial::Serial_BaudRate::Serial_BaudRate_115200;
@@ -70,10 +64,10 @@ MainWorker::doWork()
 
     static EmbyConsole::ConsoleTelnet console = EmbyConsole::ConsoleTelnet(EmbyLog::logMaskFrom(EmbyLog::LogLevel::Debug), 3000, 2);
 
-//    static ConsoleCommandsProject::Context cc;
-//    static ConsoleCommandsProject appCommands(cc);
-//    console.setApplicationCommands(&appCommands);
-//    console.start();
+    //    static ConsoleCommandsProject::Context cc;
+    //    static ConsoleCommandsProject appCommands(cc);
+    //    console.setApplicationCommands(&appCommands);
+    //    console.start();
     log_info("Starting telnet localhost:3000");
 #endif
 
@@ -89,4 +83,3 @@ MainWorker::doWork()
 
     EmbySystem::reboot();
 }
-

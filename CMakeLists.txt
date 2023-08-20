@@ -6,6 +6,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 
 
+if(APPLE)
+  
+else()
+    set(LDFLAGS "${LDFLAGS} --gc-sections")
+endif()
+
+
 if (EMBY_FOLDER)
     message(STATUS "including EMBY cmake:" ${EMBY_FOLDER}/emby.cmake)
     set(ENV{EMBY_FOLDER} ["${EMBY_FOLDER}"])
@@ -17,7 +24,6 @@ add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-le
 add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
 
 
-set(LDFLAGS "${LDFLAGS} --gc-sections")
 
 include_directories( src/* src/*/*/ )
 
@@ -37,11 +43,21 @@ project(emby-test_${EMBY_PLATFORM} C CXX ASM)
 if (LINKER_SCRIPT)
     add_link_options(-T ${LINKER_SCRIPT})
     message(STATUS "LINKER: " ${LINKER_SCRIPT})
-    add_link_options(-Wl,-gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
+    if(!APPLE)
+        add_link_options(-Wl,-gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
+    else()
+        add_link_options(-Wl, -Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
+    endif()
+
     add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})
 else ()
-    add_link_options(-Wl,-gc-sections,--print-memory-usage)
-    add_executable(${PROJECT_NAME} ${SOURCES} ${LINKER_SCRIPT})
+    if(!APPLE)
+        add_link_options(-Wl,-gc-sections,--print-memory-usage)
+    else()
+       add_link_options(-Wl)
+       add_compile_options(-Werror=format)
+    endif()
+    add_executable(${PROJECT_NAME} ${SOURCES})
 endif()
 
 

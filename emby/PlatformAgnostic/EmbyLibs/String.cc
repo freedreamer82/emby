@@ -197,7 +197,7 @@ String::String(std::initializer_list<char> init)
 
 template <class InputIterator>
 String::String(InputIterator scan, InputIterator last)
-        : String(0u)
+        : String()
 {
     while (scan != last)
     {
@@ -342,7 +342,7 @@ int String::compare(size_type pos, size_type len, String const& str) const
     }
     size_type const otherSize  = str.size();
     size_type const compareLen = std::min(len, otherSize);
-    int result = traits_type::compare(getDataPtr() + pos, str.getDataPtr(), compareLen);
+    int result = std::memcmp(getDataPtr() + pos, str.getDataPtr(), compareLen);
     if (result == 0)
     {
         result = signCompare(len, otherSize);

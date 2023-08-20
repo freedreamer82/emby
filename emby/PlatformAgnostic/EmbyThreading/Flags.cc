@@ -1,11 +1,8 @@
 #include <EmbyThreading/Flags.hh>
-#include "task.h"
 #include <EmbySystem/System.hh>
 
 namespace EmbyThreading
 {
-
-
     Flags:: Flags() :m_flags(0) , m_impl()
     {
     }

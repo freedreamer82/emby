@@ -1,20 +1,9 @@
-/**
- * @addtogroup EmbySystem
- * @{
- * @file x86_Linux/EmbySystem/System.cc
- * @author Massimiliano Pagani
- * @version 1.0
- * @date 17/10/2014
- *
- */
-
 #include <cstdlib>
 #include <EmbySystem/System.hh>
 #include <EmbyDebug/assert.hh>
 #include <unistd.h>
 #include <limits>
 #include <time.h>
-#include <sys/sysinfo.h>
 #include <sched.h>
 #include <pthread.h>
 #include <unistd.h>
@@ -35,7 +24,7 @@ namespace EmbySystem
 
 	Millis upTimeMs()
 	{
-		__syscall_slong_t const NSEC_TO_MILLIS_DENOMINATOR = 1000*1000;
+		long const NSEC_TO_MILLIS_DENOMINATOR = 1000*1000;
 		timespec result;
 		clock_gettime( CLOCK_MONOTONIC, &result );
 

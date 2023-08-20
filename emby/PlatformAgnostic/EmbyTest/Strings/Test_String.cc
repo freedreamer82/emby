@@ -1,10 +1,10 @@
 #/*
     g++ -Wall -Wextra -g -std=gnu++1y -DEMBY_BUILD_x86
-   -I../PlatformSpecific/x86/EmbySystem/  -I../PlatformAgnostic/EmbySystem
-   -I../PlatformSpecific/x86/EmbyThreading -I../PlatformAgnostic/EmbyCcLibs
-   -I. -g -std=gnu++1y EmbyTest/CcLibs_String.cc  ../PlatformSpecific/x86/EmbyThreading/Mutex.cc
+   -I../PlatformSpecific/X86_Unix/EmbySystem/  -I../PlatformAgnostic/EmbySystem
+   -I../PlatformSpecific/X86_Unix/EmbyThreading -I../PlatformAgnostic/EmbyCcLibs
+   -I. -g -std=gnu++1y EmbyTest/CcLibs_String.cc  ../PlatformSpecific/X86_Unix/EmbyThreading/Mutex.cc
     ../PlatformAgnostic/EmbyCcLibs/String.cc
-    ../PlatformSpecific/x86/EmbySystem/System.cc -o test_string
+    ../PlatformSpecific/X86_Unix/EmbySystem/System.cc -o test_string
 # */
 
 #include <EmbyLibs/String.hh>
@@ -13,16 +13,15 @@
 #include <iostream>
 #include <EmbyMachine/EmbyMachine.hh>
 
-bool        g_isInAssert = false;
+bool g_isInAssert = false;
 
-bool        g_shouldAssert = false;
+bool g_shouldAssert = false;
 extern void EmbyMachine::abort()
 {
     g_isInAssert = true;
     std::cout << "ASSERT!!" << std::endl;
-    if(g_shouldAssert)
+    if (g_shouldAssert)
     {
-
     }
     else
     {
@@ -30,7 +29,6 @@ extern void EmbyMachine::abort()
         std::cout << "ERROR: ASSERT BUT WE SHOULD NOT!!" << std::endl;
         exit(1);
     }
-
 }
 
 using namespace EmbyLibs;
@@ -38,7 +36,7 @@ typedef StringPool::size_type size_type;
 
 static std::pair<size_type, size_type> getPoolSizes()
 {
-    char*     ptr;
+    char *ptr;
     size_type shortSize;
     size_type longSize;
 
@@ -54,7 +52,7 @@ static std::pair<size_type, size_type> getPoolSizes()
 void testStaticDynamicCtors(size_type shortSize, size_type longSize)
 {
     char const test1[] = "hello";
-    String     compact(test1);
+    String compact(test1);
     assert(compact.size() == sizeof(test1) - 1);
     assert(compact.length() == compact.size());
     assert(std::equal(compact.begin(), compact.end(), test1));
@@ -102,7 +100,7 @@ void testFind()
 #define UNIQUE_TAIL "abc"
 
     String text(COMMON_PREFIX UNIQUE_TAIL);
-    auto   pos = text.find_first_not_of("123");
+    auto pos = text.find_first_not_of("123");
     assert(pos == sizeof(COMMON_PREFIX) - 1);
 
     pos = text.find_first_not_of(" ");
@@ -116,11 +114,11 @@ void testFind()
 #undef UNIQUE_TAIL
 
     String dummy = "abcde0100ghif1100";
-    auto   i     = dummy.find_last_not_of("01");
+    auto i = dummy.find_last_not_of("01");
     assert(i != String::npos);
     assert(dummy.at(i) == 'f');
     dummy = "0110101";
-    i     = dummy.find_last_not_of("01");
+    i = dummy.find_last_not_of("01");
     assert(i == String::npos);
 }
 
@@ -145,7 +143,7 @@ void testSubstr()
 #define ENDING "789"
 
     String text(FIRST_HALF CENTER ENDING);
-    auto   all = text.substr();
+    auto all = text.substr();
     assert(text == all);
     auto firstHalf = text.substr(0, sizeof(FIRST_HALF) - 1);
     assert(firstHalf == FIRST_HALF);
@@ -197,12 +195,12 @@ void testErase()
 #define MIDDLE "defgh"
 #define END "ijklm"
 
-    size_t const FIRST_LEN  = sizeof(FIRST) - 1;
+    size_t const FIRST_LEN = sizeof(FIRST) - 1;
     size_t const MIDDLE_LEN = sizeof(MIDDLE) - 1;
-    size_t const END_LEN    = sizeof(END) - 1;
+    size_t const END_LEN = sizeof(END) - 1;
 
-    String dummy                  = FIRST MIDDLE END;
-    auto&                       x = dummy.erase(size_t(0));
+    String dummy = FIRST MIDDLE END;
+    auto &x = dummy.erase(size_t(0));
     assert(&x == &dummy);
     assert(dummy.empty());
     dummy = FIRST MIDDLE END;
@@ -215,10 +213,10 @@ void testErase()
     dummy.erase(FIRST_LEN + MIDDLE_LEN, END_LEN);
     assert(dummy == FIRST MIDDLE);
 
-    dummy                  = FIRST MIDDLE END;
-    auto                 b = dummy.begin() + FIRST_LEN;
-    auto                 e = b + MIDDLE_LEN;
-    auto                 n = dummy.erase(b, e);
+    dummy = FIRST MIDDLE END;
+    auto b = dummy.begin() + FIRST_LEN;
+    auto e = b + MIDDLE_LEN;
+    auto n = dummy.erase(b, e);
     assert(n == b);
     assert(dummy == FIRST END);
 
@@ -227,26 +225,26 @@ void testErase()
 #undef FIRST
 
     String foo = "012345";
-    auto   i   = foo.erase(foo.begin() + 2);
+    auto i = foo.erase(foo.begin() + 2);
     assert(*i == '3');
     assert(foo == "01345");
 }
-const char* TEST_258Len =
+const char *TEST_258Len =
     "11123451234567123456789abc12345678absaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadasdasdasfss3222222222222"
     "2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222"
     "222222222222222222222222fassssssc123456789abc123456789abc123456789abc1";
-const char* TEST2_256Len =
+const char *TEST2_256Len =
     "123451234567123456789abc12345678absaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadasdasdasfss322222222222222"
     "2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222"
     "2222222222222222222222fassssssc123456789abc123456789abc123456789abc1";
-const char* TEST3_255Len =
+const char *TEST3_255Len =
     "23451234567123456789abc12345678absaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadasdasdasfss3222222222222222"
     "2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222"
     "222222222222222222222fassssssc123456789abc123456789abc123456789abc1";
 
 void testAppend()
 {
-    int    v = 0;
+    int v = 0;
     String dummy("a");
     dummy.append(dummy);
     assert(dummy == "aa");
@@ -267,9 +265,9 @@ void testAppend()
     assert(a == SIXTEEN SIXTEEN);
 #undef SIXTEEN
 
-    String      c = "abc";
-    String      d;
-    char const* buffer = "defghi";
+    String c = "abc";
+    String d;
+    char const *buffer = "defghi";
 
     v = c.append(buffer, 4);
     assert(c == "abcdefg" && v == 0);
@@ -297,17 +295,17 @@ void testAppend()
 
 void testCstring()
 {
-    const char* TEST = "11111111111111121dasfSDFzsdfSDFasdfSDFsDfzsdfzs";
-    String      dummy(TEST);
-    const char* c    = dummy.c_str();
-    int         diff = strcmp(c, TEST);
+    const char *TEST = "11111111111111121dasfSDFzsdfSDFasdfSDFsDfzsdfzs";
+    String dummy(TEST);
+    const char *c = dummy.c_str();
+    int diff = strcmp(c, TEST);
     assert(diff == 0);
     assert(strlen(dummy.c_str()) == strlen(TEST));
 
     // 256 len that is MAX , when push a terminator if fails...it depends on the policy used default
     // is Nullptr
-    String      dummy2(TEST2_256Len);
-    const char* c2 = dummy2.c_str();
+    String dummy2(TEST2_256Len);
+    const char *c2 = dummy2.c_str();
     assert(c2 == nullptr);
 
     // 258 len
@@ -328,8 +326,8 @@ void testCstringAssert()
     String dummy3(TEST_258Len);
     assert(g_isInAssert == true);
     std::cout << "This test should ASSERT!" << std::endl;
-    g_isInAssert   = false;
-    const char* c3 = dummy3.c_str();
+    g_isInAssert = false;
+    const char *c3 = dummy3.c_str();
     assert(c3 == nullptr);
     std::cout << "End Asssert Test" << std::endl;
     g_isInAssert = false;
@@ -342,14 +340,33 @@ void testStringUtils()
     String head("abcd");
     String tail("efg");
     String faketail("ffg");
-    bool   ok = false;
-    ok        = doesStringBeginWith(a, head);
+    bool ok = false;
+    ok = doesStringBeginWith(a, head);
     assert(ok);
     ok = doesStringEndWith(a, tail);
     assert(ok);
     ok = doesStringEndWith(a, faketail);
     assert(!ok);
 }
+
+void testCompare()
+{
+    String str1("green apple");
+    String str2("red apple");
+    String str3("apple");
+
+
+    if (str1.compare(6, 5, String(("apple"))) == 0)
+    {
+        std::cout << str1.c_str() << " starting from 6 char and for next 5 char is an apple" << std::endl;
+    }
+    else
+    {
+        assert(false);
+    }
+
+}
+
 int main()
 {
     std::cout << "Start String Test..." << std::endl;
@@ -375,6 +392,8 @@ int main()
     testCstringAssert();
 
     testStringUtils();
+
+    testCompare();
 
     std::cout << "OK" << std::endl;
 

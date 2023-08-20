@@ -1,11 +1,3 @@
-/**
- * @addtogroup EmbyThreading
- * @{
- * @file EmbyThreading/Semaphore.cc
- * @author apagani
- * @version 1.0
- * @date Jan 28, 2015
- */
 
 #include <EmbyThreading/Semaphore.hh>
 #include <EmbySystem/System.hh>
