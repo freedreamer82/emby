@@ -1,15 +1,8 @@
-/**
- * @addtogroup EmbyLibs
- * @{
- *
- * @file EmbyLibs/OutputFormatter.cc
- * @author Massimiliano Pagani
- * @date 2015-09-01
- */
 
 #include <EmbyLibs/OutputFormatter.hh>
 #include <EmbyDebug/assert.hh>
 #include <EmbyLibs/String.hh>
+#include <EmbyLibs/StringUtils.hh>
 #include <utility>
 #include <algorithm>
 #include <cstring>
@@ -162,6 +155,7 @@ namespace EmbyLibs
                 void printDecimalInt( IOutput& out, va_list* args );
                 void printDecimalUint( IOutput& out, va_list* args );
                 void printHexUint( IOutput& out, va_list* args );
+                void printFloat( IOutput& out, va_list* args );
                 void pushPercentFlag( char const* scan, IOutput& out, va_list* args );
                 void pushPercentWidth( char const* scan, IOutput& out, va_list* args );
                 void pushPercentPrecision( char const* scan, IOutput& out, va_list* args );
@@ -362,6 +356,14 @@ namespace EmbyLibs
             out.transmit( &ch, 1 );
         }
 
+
+        inline void PrintfState::printFloat(  IOutput& out, va_list* args )
+        {
+             auto floatStr = EmbyLibs::float2String(  va_arg( *args, double ) ,   4);
+             out.transmit( floatStr.data(), floatStr.length() );
+        }
+
+
         void PrintfState::padBuffer( IOutput& out,
                                      char const* buffer,
                                      size_t length,
@@ -546,6 +548,8 @@ namespace EmbyLibs
                 case 'e':
                 case 'E':
                 case 'f':
+                    printFloat( out, args );
+                    break;
                 case 'F':
                 case 'g':
                 case 'G':

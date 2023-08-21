@@ -64,9 +64,6 @@ namespace EmbyLibs
     int
     atoi(String const &value, int base = 10);
 
-    // Converts a floating point number to string.
-    void ftoa(float n, char *res, int afterpoint);
-
     /**
      * Copy the content of a String to a C string.
      *
@@ -88,7 +85,7 @@ namespace EmbyLibs
 
     String float2String(float n, int afterpoint = 4);
 
-    void float2String(float n, char *res, int afterpoint = 4);
+    int float2String(float n, char *res, int afterpoint = 4);
 
     bool ip4NumberToString(uint32_t ipno, EmbyLibs::String *ipstring);
 

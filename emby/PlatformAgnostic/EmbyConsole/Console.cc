@@ -1229,7 +1229,7 @@ namespace EmbyConsole
     void Console::printFloat(float f, FloatPrecision p)
     {
         char res[20];
-        EmbyLibs::ftoa(f, res, 4);
+        EmbyLibs::float2String(f, res, 4);
         print(res);
         print(" ");
     }

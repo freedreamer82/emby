@@ -334,6 +334,7 @@ void testCstringAssert()
     g_shouldAssert = false;
 }
 
+
 void testStringUtils()
 {
     String a("abcdefg");
@@ -347,6 +348,12 @@ void testStringUtils()
     assert(ok);
     ok = doesStringEndWith(a, faketail);
     assert(!ok);
+
+    char buffer[20];
+    float t = 12.345678;
+    int len = float2String( t,buffer,4);
+    std::cout << len << std::endl;
+    assert(len == 7);
 }
 
 void testCompare()
