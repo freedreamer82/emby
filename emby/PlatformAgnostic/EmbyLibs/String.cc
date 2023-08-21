@@ -342,7 +342,7 @@ int String::compare(size_type pos, size_type len, String const& str) const
     }
     size_type const otherSize  = str.size();
     size_type const compareLen = std::min(len, otherSize);
-    int result = std::memcmp(getDataPtr() + pos, str.getDataPtr(), compareLen);
+    int result = memcmp(getDataPtr() + pos, str.getDataPtr(), compareLen);
     if (result == 0)
     {
         result = signCompare(len, otherSize);

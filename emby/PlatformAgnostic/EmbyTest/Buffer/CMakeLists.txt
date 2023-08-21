@@ -37,7 +37,7 @@ add_compile_options("${COMPILE_OPTS}")
 add_link_options("${COMPILE_OPTS}")
 set(CMAKE_EXE_LINKER_FLAGS  "${COMPILE_OPTS}")
 
-if(!APPLE)
+if(LINUX)
    add_compile_options(-fsingle-precision-constant)
 endif()
 add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0  -Werror=return-type)

@@ -30,7 +30,7 @@ include("${EMBY_FOLDER}/toolchain.cmake")
 
 add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
 
-if(!APPLE)
+if(LINUX)
   add_compile_options(-fsingle-precision-constant)
 endif()
 
