@@ -1,13 +1,3 @@
-/**
- * @addtogroup Drivers
- * @{
- * @file UART_Arch.h
- *
- * @brief
- * @version 1.0
- * @date 2/02/2012
- *
- */
 #if !defined(UART_IMPLH_H)
 #define UART_IMPLH_H
 

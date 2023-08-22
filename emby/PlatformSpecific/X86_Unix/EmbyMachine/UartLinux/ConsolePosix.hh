@@ -1,20 +1,3 @@
-
-/**
- * @addtogroup Application
- * @{
- *
- * @file Console.h
- *
- * @brief
- *
- * @author Marco Garzola
- * @version 00.01
- *
- */
-
-/* Define to prevent recursive inclusion -------------------------------------*/
-
-
 #if !defined( EMBYCONSOLE_POSIXCONSOLE_HH )
 #define EMBYCONSOLE_POSIXCONSOLE_HH
 

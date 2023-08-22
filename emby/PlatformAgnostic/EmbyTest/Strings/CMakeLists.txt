@@ -29,7 +29,7 @@ endif()
 add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0  -Werror=return-type)
 
 # uncomment to mitigate c++17 absolute addresses warnings
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-register -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-register -fno-exceptions  -fno-use-cxa-atexit -fno-threadsafe-statics ")
 
 # Enable assembler files preprocessing
 add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
@@ -45,21 +45,16 @@ message(STATUS ${ROOT_DIR})
 
 message(STATUS ${PROJECT_SOURCE_DIR})
 
-include_directories( ${ROOT_DIR}/PlatformAgnostic/
-        ${ROOT_DIR}/PlatformSpecific/X86_Unix/EmbySystem/
-        ${ROOT_DIR}/PlatformSpecific/X86_Unix/EmbyThreading)
+# include_directories( ${ROOT_DIR}/PlatformAgnostic/
+#         ${ROOT_DIR}/PlatformSpecific/X86_Unix/EmbySystem/
+#         ${ROOT_DIR}/PlatformSpecific/X86_Unix/EmbyThreading)
 
 #project def goes AFTER TOOLCHAIN SETUP!!!! otherwise doesn't recognize correctly gcc
-project(test-string CXX ASM)
+project(test-string C CXX ASM)
 
 file(GLOB_RECURSE SOURCES
-        "Test_String.cc"
-        "${ROOT_DIR}/PlatformSpecific/X86_Unix/EmbyThreading/Mutex.cc"
-        "${ROOT_DIR}/PlatformSpecific/X86_Unix/EmbySystem/System.cc"
-        "${ROOT_DIR}/PlatformAgnostic/EmbyLibs/String.cc"
-        "${ROOT_DIR}/PlatformAgnostic/EmbyLibs/StringUtils.cc"
-        "${ROOT_DIR}/PlatformAgnostic/EmbyLibs/OutputFormatter.cc")
-
+        "Test_String.cc")
+ list (APPEND SOURCES ${SOURCES} ${EMBY_SOURCES})
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 

@@ -43,7 +43,7 @@ endif()
 add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0  -Werror=return-type)
 
 # uncomment to mitigate c++17 absolute addresses warnings
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-register -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-register -fno-exceptions -fno-use-cxa-atexit -fno-threadsafe-statics ")
 
 # Enable assembler files preprocessing
 add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
@@ -59,17 +59,13 @@ message(STATUS ${ROOT_DIR})
 
 message(STATUS ${PROJECT_SOURCE_DIR})
 
-include_directories( ${ROOT_DIR}/PlatformAgnostic/
-        ${ROOT_DIR}/PlatformSpecific/X86_Unix/EmbySystem/
-        ${ROOT_DIR}/PlatformSpecific/X86_Unix/EmbyThreading)
-
 #project def goes AFTER TOOLCHAIN SETUP!!!! otherwise doesn't recognize correctly gcc
-project(test-cbuffer CXX ASM)
+project(test-cbuffer C CXX ASM)
 
 file(GLOB_RECURSE SOURCES
-        "Test_CircularBuffer.cc"
-        "${ROOT_DIR}/PlatformSpecific/x86/EmbySystem/System.cc")
+        "Test_CircularBuffer.cc" )
 
+list (APPEND SOURCES ${SOURCES} ${EMBY_SOURCES})
 add_executable(${PROJECT_NAME} ${SOURCES} )
 
 ## report size
