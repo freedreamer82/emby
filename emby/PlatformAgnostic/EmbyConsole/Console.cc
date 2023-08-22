@@ -1226,10 +1226,10 @@ namespace EmbyConsole
         m_errorCode = errorCode;
     }
 
-    void Console::printFloat(float f, FloatPrecision p)
+    void Console::printFloat(float f, FloatPrecision n)
     {
         char res[20];
-        EmbyLibs::ftoa(f, res, 4);
+        EmbyLibs::float2String(f, res, int(n));
         print(res);
         print(" ");
     }

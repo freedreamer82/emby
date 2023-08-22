@@ -2,6 +2,8 @@
 #include <EmbyLibs/OutputFormatter.hh>
 #include <cmath>
 
+char static_assert_float32[1 - (2 * ((sizeof(float) * 8) != 32))];
+
 namespace EmbyLibs
 {
     static const char *TRUE_STR = "true";
@@ -408,28 +410,8 @@ namespace EmbyLibs
         }
 
         char res[20];
-        // Extract integer part
-        int ipart = (int) n;
-
-        // Extract floating part
-        float fpart = n - (float) ipart;
-
-        // convert integer part to string
-        int i = intToStr(ipart, res, 0);
-
-        // check for display option after point
-        if (afterpoint != 0)
-        {
-            res[i] = '.';  // add dot
-
-            // Get the value of fraction part upto given no.
-            // of points after dot. The third parameter is needed
-            // to handle cases like 233.007
-            fpart = fpart * std::pow(10, afterpoint);
-
-            intToStr((int) fpart, res + i + 1, afterpoint);
-        }
-
+        memset(res,0,sizeof(res) );
+        int len = float2String(n,res,afterpoint);
         if (isNeg)
         {
             String ret("-");
@@ -445,8 +427,9 @@ namespace EmbyLibs
 
 
     // Converts a floating point number to string.
-    void float2String(float n, char *res, int afterpoint)
+    int float2String(float n, char *res, int afterpoint)
     {
+        int len = 0;
         // Extract integer part
         int ipart = (int) n;
 
@@ -455,19 +438,21 @@ namespace EmbyLibs
 
         // convert integer part to string
         int i = intToStr(ipart, res, 0);
-
+        len+=i;
         // check for display option after point
         if (afterpoint != 0)
         {
             res[i] = '.';  // add dot
-
+            len+=1; //the dot
             // Get the value of fraction part upto given no.
             // of points after dot. The third parameter is needed
             // to handle cases like 233.007
             fpart = fpart * pow(10, afterpoint);
 
-            intToStr((int) fpart, res + i + 1, afterpoint);
+            i = intToStr((int) fpart, res + i + 1, afterpoint);
+            len+=i;
         }
+        return len;
     }
 
     char *cltrim(char *str)
@@ -622,31 +607,7 @@ namespace EmbyLibs
 
     }
 
-    // Converts a floating point number to string.
-    void ftoa(float n, char *res, int afterpoint)
-    {
-        // Extract integer part
-        int ipart = (int) n;
 
-        // Extract floating part
-        float fpart = n - (float) ipart;
-
-        // convert integer part to string
-        int i = intToStr(ipart, res, 0);
-
-        // check for display option after point
-        if (afterpoint != 0)
-        {
-            res[i] = '.';  // add dot
-
-            // Get the value of fraction part upto given no.
-            // of points after dot. The third parameter is needed
-            // to handle cases like 233.007
-            fpart = fpart * pow(10, afterpoint);
-
-            intToStr((int) fpart, res + i + 1, afterpoint);
-        }
-    }
 
 }  // end of namespace EmbyLibs
 ///@}

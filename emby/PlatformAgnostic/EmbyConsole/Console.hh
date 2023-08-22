@@ -129,12 +129,12 @@ namespace EmbyConsole
 
         enum class FloatPrecision : uint32_t
         {
-            DEC1 = 10,
-            DEC2 = 100,
-            DEC3 = 1000,
-            DEC4 = 10000,
-            DEC5 = 100000,
-            DEC6 = 1000000,
+            DEC1 = 1,
+            DEC2,
+            DEC3,
+            DEC4,
+            DEC5,
+            DEC6,
 
         };
 
