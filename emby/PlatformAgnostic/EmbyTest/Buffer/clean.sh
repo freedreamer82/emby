@@ -1,1 +1,1 @@
-sudo rm -rf CMakeFiles/* cmake_install.cmake Makefile  CMakeCache.txt CMakeFiles test-buffer
+sudo rm -rf CMakeFiles/* cmake_install.cmake Makefile  CMakeCache.txt CMakeFiles emby-test-*

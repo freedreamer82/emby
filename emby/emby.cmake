@@ -15,16 +15,18 @@ if (EMBY_CONFIG)
     endif()
 endif()
 
-if (EMBY_PLATFORM)
-    include("${EMBY_FOLDER}/PlatformSpecific/${EMBY_PLATFORM}/emby-platform.cmake")
-     message(STATUS "PLATFORM: " ${EMBY_PLATFORM})
-    include_directories(${EMBY_FOLDER}/PlatformSpecific/${EMBY_PLATFORM})
-    add_compile_definitions(EMBY_BUILD_${EMBY_PLATFORM})
-endif()
 
 if (EMBY_FOLDER)
     message(STATUS "EMBY folder:" "${EMBY_FOLDER}")
+    include_directories(${EMBY_FOLDER}/Include/)
 endif ()
+
+if (EMBY_PLATFORM)
+    include("${EMBY_FOLDER}/PlatformSpecific/${EMBY_PLATFORM}/emby-platform.cmake")
+    message(STATUS "PLATFORM: " ${EMBY_PLATFORM})
+    include_directories(${EMBY_FOLDER}/PlatformSpecific/${EMBY_PLATFORM})
+    add_compile_definitions(EMBY_BUILD_${EMBY_PLATFORM})
+endif()
 
 include("${EMBY_FOLDER}/toolchain.cmake")
 
