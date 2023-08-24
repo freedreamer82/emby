@@ -37,6 +37,13 @@ file(GLOB_RECURSE APP_SOURCES
 list (APPEND SOURCES ${APP_SOURCES} ${EMBY_SOURCES})
 
 
+#show Include dirs
+#get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+#foreach(dir ${dirs})
+#    message(STATUS "dir='${dir}'")
+#endforeach()
+
+
 # project settings
 project(emby-test_${EMBY_PLATFORM}  CXX C ASM)
 
@@ -64,12 +71,15 @@ endif()
 set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
 set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
 
+
+
 if (${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.elf)
 add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${PROJECT_NAME}.elf> ${HEX_FILE}
         COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${PROJECT_NAME}.elf> ${BIN_FILE}
         COMMENT "Building ${HEX_FILE} Building ${BIN_FILE}")
 endif()
+
 
 ## report size
 function(show_object_size target)
