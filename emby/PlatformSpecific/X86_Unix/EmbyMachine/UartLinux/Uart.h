@@ -1,20 +1,3 @@
-/******************** (C) COPYRIGHT 2009 MR&D Institute ***********************/
-/**
- * @file Uart.h
- *
- * @brief <brief description>
- *
- * <detailed description, on one or more rows>
- *
- * @author Garzola Marco & MrD Team
- * @version <00.01>
- * @date 8/10/2012
- * @note None
- *
- */
-
-/* Define to prevent recursive inclusion -------------------------------------*/
-
 #if !defined(UART_H)
 #define UART_H
 

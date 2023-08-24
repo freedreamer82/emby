@@ -38,7 +38,7 @@ list (APPEND SOURCES ${APP_SOURCES} ${EMBY_SOURCES})
 
 
 # project settings
-project(emby-test_${EMBY_PLATFORM} C CXX ASM)
+project(emby-test_${EMBY_PLATFORM}  CXX C ASM)
 
 if (LINKER_SCRIPT)
     add_link_options(-T ${LINKER_SCRIPT})

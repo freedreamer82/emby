@@ -1,13 +1,4 @@
-/**
- * @addtogroup EmbyConsole
- * @{
- * @file EmbyConsole/SerialImpl.h
- *
- * @brief
- * @version 1.0
- * @date 2/02/2012
- *
- */
+
 #if !defined(SERIAL_IMPLH_H)
 #define SERIAL_IMPLH_H
 

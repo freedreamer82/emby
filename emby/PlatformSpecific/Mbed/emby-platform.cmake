@@ -10,7 +10,7 @@ add_compile_definitions(EMBY_BUILD_ARM)
 
 
 file(GLOB_RECURSE EMBY_PLAT_SOURCES
-        "${EMBY_FOLDER}/PlatformSpecific/${EMBY_PLATFORM}/*/*.cc"  "${EMBY_FOLDER}/PlatformSpecific/${EMBY_PLATFORM}/*/*.c"  "${EMBY_FOLDER}/PlatformSpecific/${EMBY_PLATFORM}/*/*/*.c ${EMBY_FOLDER}/PlatformSpecific/${EMBY_PLATFORM}/*/*/*.c")
+        "${EMBY_FOLDER}/PlatformSpecific/${EMBY_PLATFORM}/*/*.cc"  "${EMBY_FOLDER}/PlatformSpecific/${EMBY_PLATFORM}/*/*.c"  "${EMBY_FOLDER}/PlatformSpecific/${EMBY_PLATFORM}/*/*/*.c" "${EMBY_FOLDER}/PlatformSpecific/${EMBY_PLATFORM}/*/*/*.c ${EMBY_FOLDER}/PlatformSpecific/${EMBY_PLATFORM}/*/*/*.c")
 list(APPEND SOURCES ${EMBY_PLAT_SOURCES})
 
 #message(STATUS  "${EMBY_PLAT_SOURCES}")
