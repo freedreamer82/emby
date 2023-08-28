@@ -13,7 +13,6 @@
 
 //#include <cstdlib>
 #include <EmbyDebug/assert.hh>
-#include <unistd.h>
 #include <EmbyThreading/Mutex_Impl.hh>
 #include <EmbyTime/Millis.hh>
 

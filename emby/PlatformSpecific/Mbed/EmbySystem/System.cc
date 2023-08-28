@@ -1,12 +1,3 @@
-/**
- * @addtogroup EmbySystem
- * @{
- * @file K10_FreeRtos/EmbySystem/System.cc
- * @author Massimiliano Pagani
- * @version 1.0
- * @date 17/10/2014
- *
- */
 
 #include <cstdlib>
 #include <EmbyTime/Millis.hh>

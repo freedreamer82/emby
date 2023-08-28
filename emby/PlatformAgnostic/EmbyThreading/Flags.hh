@@ -10,8 +10,6 @@
 
 #include <EmbyThreading/Flags_Impl.hh>
 #include <EmbyDebug/assert.hh>
-#include <unistd.h>
-
 
 namespace EmbyThreading
 {

@@ -1,6 +1,7 @@
 #include <EmbySystem/Timer.hh>
-//#include <critical.h>
+// #include <critical.h>
 #include "EmbyDebug/assert.hh"
+#include <EmbySystem/TimerImpl.hh>
 
 static uint16_t s_timerInstancesCount = 0;
 
@@ -34,8 +35,6 @@ void TimerImpl::threadCallback()
                 // just stop after the first tick.
                 if (!periodic)
 
-
-
                 {
                     running = false;
                 }
@@ -68,46 +67,33 @@ void TimerImpl::tickerCallback()
 
 //=============================================================================
 
-EmbySystem::Timer::Timer(EmbySystem::TimerSize   ms,
-                         bool                    isPeriodic,
-                         EmbySystem::Timer::Type type,
-                         size_t                  stackSize,
-                         const char*             name,
-                         uint32_t*               stack)
+EmbySystem::Timer::Timer(EmbySystem::TimerSize ms, bool isPeriodic, uint32_t* stack, Type type)
+
 {
-    core_util_atomic_incr_u16(&s_timerInstancesCount, 1);
-
-    m_impl.timer = this;
-
-    if (type == Type::Software)
-    {
-        if (name == nullptr)
-        {
-            static size_t constexpr NAME_LEN = 11; // Space for "timer-"+[0-65535]
-            m_impl.threadName                = new char[NAME_LEN + 1];
-            std::snprintf(m_impl.threadName, NAME_LEN, "timer-%u", s_timerInstancesCount);
-            m_impl.threadName[NAME_LEN] = '\0';
-        }
-        else
-        {
-            m_impl.threadName = nullptr;
-        }
-
-        m_impl.thread = new Thread{osPriorityNormal,
-                                   static_cast<uint32_t>(stackSize),
-                                   reinterpret_cast<unsigned char*>(stack),
-                                   m_impl.threadName};
-        EmbyDebug_ASSERT_CHECK_NULL_PTR(m_impl.thread);
-
-    }
-    else
-    {
-        m_impl.thread = nullptr;
-    }
-
-    m_impl.periodic   = isPeriodic;
-    m_impl.running    = false;
-    m_impl.durationMs = ms;
+//    core_util_atomic_incr_u16(&s_timerInstancesCount, 1);
+//
+//    m_impl.timer = this;
+//
+//    if (type == Type::Software)
+//    {
+//
+//       m_impl.threadName = nullptr;
+//
+//
+//        m_impl.thread = new Thread{osPriorityNormal,
+//                                   static_cast<uint32_t>(stackSize),
+//                                   reinterpret_cast<unsigned char*>(stack),
+//                                   m_impl.threadName};
+//        EmbyDebug_ASSERT_CHECK_NULL_PTR(m_impl.thread);
+//    }
+//    else
+//    {
+//        m_impl.thread = nullptr;
+//    }
+//
+//    m_impl.periodic   = isPeriodic;
+//    m_impl.running    = false;
+//    m_impl.durationMs = ms;
 }
 
 //=============================================================================
@@ -227,23 +213,23 @@ bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::T
 //=============================================================================
 
 //
-//#include <EmbySystem/Timer.hh>
-//#include <critical.h>
-//#include "EmbyDebug/assert.hh"
+// #include <EmbySystem/Timer.hh>
+// #include <critical.h>
+// #include "EmbyDebug/assert.hh"
 //
-//static uint16_t s_timerInstancesCount = 0;
+// static uint16_t s_timerInstancesCount = 0;
 //
-//using namespace EmbySystem;
+// using namespace EmbySystem;
 //
 ////=============================================================================
 //
-//namespace
+// namespace
 //{
 //    uint16_t constexpr THREAD_FLAG_TICK = 1 << 0; // Software timer flag
 //    uint16_t constexpr THREAD_FLAG_STOP = 1 << 1; // Thread refresh
 //} // namespace
 //
-//void TimerImpl::threadCallback()
+// void TimerImpl::threadCallback()
 //{
 //    while (running)
 //    {
@@ -273,7 +259,7 @@ bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::T
 //    }
 //}
 //
-//void TimerImpl::tickerCallback()
+// void TimerImpl::tickerCallback()
 //{
 //    if (!running)
 //    {
@@ -297,7 +283,7 @@ bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::T
 //
 ////=============================================================================
 //
-//EmbySystem::Timer::Timer(EmbySystem::TimerSize   ms,
+// EmbySystem::Timer::Timer(EmbySystem::TimerSize   ms,
 //                         bool                    isPeriodic,
 //                         EmbySystem::Timer::Type type,
 //                         size_t                  stackSize,
@@ -341,7 +327,7 @@ bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::T
 //
 ////=============================================================================
 //
-//EmbySystem::Timer::~Timer()
+// EmbySystem::Timer::~Timer()
 //{
 //    // Stop the timer
 //    stop();
@@ -362,14 +348,14 @@ bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::T
 //
 ////=============================================================================
 //
-//bool EmbySystem::Timer::isActive()
+// bool EmbySystem::Timer::isActive()
 //{
 //    return m_impl.running;
 //}
 //
 ////=============================================================================
 //
-//bool EmbySystem::Timer::start(EmbySystem::TimerSize)
+// bool EmbySystem::Timer::start(EmbySystem::TimerSize)
 //{
 //    // If already running return true
 //    if (m_impl.running)
@@ -397,7 +383,7 @@ bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::T
 //
 ////=============================================================================
 //
-//bool EmbySystem::Timer::stop(EmbySystem::TimerSize)
+// bool EmbySystem::Timer::stop(EmbySystem::TimerSize)
 //{
 //    if (!m_impl.running)
 //    {
@@ -424,7 +410,7 @@ bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::T
 //
 ////=============================================================================
 //
-//bool EmbySystem::Timer::reset(EmbySystem::TimerSize)
+// bool EmbySystem::Timer::reset(EmbySystem::TimerSize)
 //{
 //    if (m_impl.running)
 //    {
@@ -438,7 +424,7 @@ bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::T
 //
 ////=============================================================================
 //
-//bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::TimerSize)
+// bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::TimerSize)
 //{
 //    m_impl.durationMs = NewPeriod;
 //
@@ -466,27 +452,27 @@ bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::T
 //
 //
 //
-//#include <EmbySystem/Timer.hh>
-//#include <critical.h>
-//#include "EmbyDebug/assert.hh"
+// #include <EmbySystem/Timer.hh>
+// #include <critical.h>
+// #include "EmbyDebug/assert.hh"
 //
-//static uint16_t s_timerInstancesCount = 0;
-//static constexpr uint16_t NUM_TIMER = 6;
+// static uint16_t s_timerInstancesCount = 0;
+// static constexpr uint16_t NUM_TIMER = 6;
 //
 //
 //
 //
 //__attribute__((section(".itcmram"), used)) uint8_t s_buffer[EVENTS_EVENT_SIZE*NUM_TIMER];
-//using namespace EmbySystem;
+// using namespace EmbySystem;
 //
 //
-//static EventQueue s_eventsQueue(EVENTS_EVENT_SIZE*NUM_TIMER,s_buffer );
-//static Thread s_thread;
+// static EventQueue s_eventsQueue(EVENTS_EVENT_SIZE*NUM_TIMER,s_buffer );
+// static Thread s_thread;
 //
 //
 ////=============================================================================
 //
-//namespace
+// namespace
 //{
 //    uint16_t constexpr THREAD_FLAG_TICK = 1 << 0; // Software timer flag
 //    uint16_t constexpr THREAD_FLAG_STOP = 1 << 1; // Thread refresh
@@ -496,7 +482,7 @@ bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::T
 //
 ////=============================================================================
 //
-//EmbySystem::Timer::Timer(EmbySystem::TimerSize   ms,
+// EmbySystem::Timer::Timer(EmbySystem::TimerSize   ms,
 //                         bool                    isPeriodic,
 //                         EmbySystem::Timer::Type type,
 //                         size_t                  stackSize,
@@ -540,7 +526,7 @@ bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::T
 //
 ////=============================================================================
 //
-//EmbySystem::Timer::~Timer()
+// EmbySystem::Timer::~Timer()
 //{
 //    // Stop the timer
 //    stop();
@@ -561,14 +547,14 @@ bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::T
 //
 ////=============================================================================
 //
-//bool EmbySystem::Timer::isActive()
+// bool EmbySystem::Timer::isActive()
 //{
 //    return m_impl.running;
 //}
 //
 ////=============================================================================
 //
-//bool EmbySystem::Timer::start(EmbySystem::TimerSize)
+// bool EmbySystem::Timer::start(EmbySystem::TimerSize)
 //{
 //    // If already running return true
 //    if (m_impl.running)
@@ -596,7 +582,7 @@ bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::T
 //
 ////=============================================================================
 //
-//bool EmbySystem::Timer::stop(EmbySystem::TimerSize)
+// bool EmbySystem::Timer::stop(EmbySystem::TimerSize)
 //{
 //    if (!m_impl.running)
 //    {
@@ -623,7 +609,7 @@ bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::T
 //
 ////=============================================================================
 //
-//bool EmbySystem::Timer::reset(EmbySystem::TimerSize)
+// bool EmbySystem::Timer::reset(EmbySystem::TimerSize)
 //{
 //    if (m_impl.running)
 //    {
@@ -637,7 +623,7 @@ bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::T
 //
 ////=============================================================================
 //
-//bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::TimerSize)
+// bool EmbySystem::Timer::setPeriod(EmbySystem::TimerSize NewPeriod, EmbySystem::TimerSize)
 //{
 //    m_impl.durationMs = NewPeriod;
 //

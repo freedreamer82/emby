@@ -13,7 +13,6 @@
 
 #include <cstdlib>
 #include <EmbyDebug/assert.hh>
-#include <unistd.h>
 #include <limits>
 
 

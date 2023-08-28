@@ -14,7 +14,6 @@
 #include <cstdlib>
 #include <EmbyTime/Millis.hh>
 #include <EmbyDebug/assert.hh>
-#include <unistd.h>
 #include <limits>
 //#include "EmbySystem_Impl.hh"
 #include <EmbySystem/EmbySystem_Impl.hh>
@@ -74,6 +73,7 @@ namespace EmbySystem
     bool
     isInInterrupt();
 
+    bool areInterruptsEnabled();
     /**
     * stop the OS Scheduler
     */

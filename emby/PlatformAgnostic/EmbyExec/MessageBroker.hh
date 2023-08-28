@@ -11,8 +11,6 @@
 #include <functional>
 #include <EmbyLibs/CircularBuffer.hh>
 #include <EmbyLibs/Buffer.hh>
-#include <EmbyLibs/Function.hh>
-#include <EmbyLibs/CallbackVector.hh>
 
 namespace EmbyExec
 {

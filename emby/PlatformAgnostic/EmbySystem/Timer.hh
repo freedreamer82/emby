@@ -40,7 +40,7 @@ namespace EmbySystem
         *  @param Periodic true if the timer expires every PeriodInTicks.
         *         false if this is a one shot timer.
         */
-        Timer(TimerSize ms, bool isPeriodic = true,Type = Type::Software);
+        Timer(EmbySystem::TimerSize ms, bool isPeriodic = true,Type = Type::Software);
 
         /**
          *  Construct a named timer.
@@ -53,7 +53,7 @@ namespace EmbySystem
          *         false if this is a one shot timer.
          *  @param stack If not null, the timer will be allocated on the given static memory.
          */
-        Timer(TimerSize ms, bool isPeriodic = true, uint32_t *stack = nullptr, Type = Type::Software);
+        Timer(EmbySystem::TimerSize ms, bool isPeriodic = true, uint32_t *stack = nullptr, Type = Type::Software);
 
         /**
          *  Destructor
