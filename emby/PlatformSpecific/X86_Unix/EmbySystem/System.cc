@@ -71,7 +71,7 @@ namespace EmbySystem
     getSystemUniqueId()
     {
         SystemUniqueId id;
-        std::fill( std::begin( id.m_id ), std::end( id.m_id ), 0 );
+
         return id;
     }
 

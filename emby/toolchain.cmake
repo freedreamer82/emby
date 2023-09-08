@@ -1,7 +1,7 @@
 # this one is important
 if(LINUX)
     SET(CMAKE_SYSTEM_NAME Linux)
-elif(APPLE) 
+elseif(APPLE)
     SET(CMAKE_SYSTEM_NAME Darwin)
 endif()
 

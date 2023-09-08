@@ -11,7 +11,7 @@ add_compile_definitions(EMBY_BUILD_X86)
 #include all sbdirectories
 SUBDIRLIST(SUBDIRS "${EMBY_FOLDER}/PlatformSpecific/${EMBY_PLATFORM}/")
 foreach(subdir ${SUBDIRS})
-    include_directories(${EMBY_FOLDER}/PlatformSpecific/${EMBY_PLATFORM}/${subdir})
+    include_directories(${subdir})
 endforeach()
 
 file(GLOB_RECURSE EMBY_PLAT_SOURCES
