@@ -1,8 +1,9 @@
+./cleanall.sh
+
 # Create build directory if it doesn't exist
 mkdir -p build
 cd build
 
-./cleanall.sh
 
 cmake \
     -DEMBY_FOLDER=$PWD/../emby \
