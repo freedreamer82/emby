@@ -13,7 +13,7 @@
 #if defined(EMBY_CFG_DISABLE_BUFFER_CRITICAL_SECTIONS)
 #define SCOPED_CRITICAL_SECTION()
 #else
-#define SCOPED_CRITICAL_SECTION() EmbySystem::CriticalSection cs
+#define SCOPED_CRITICAL_SECTION() if (!EmbySystem::isInInterrupt()) EmbySystem::CriticalSection cs
 #endif
 
 namespace EmbyLibs
