@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.17)
+
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_VERSION 1)
 cmake_minimum_required(VERSION 3.17)
@@ -24,38 +26,19 @@ add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-le
 add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
 
 # Include directories
-include_directories(src/* src/**/)
-
-# Determine the platform-specific directory and EmbyAppMachine.cc path
-if(EMBY_PLATFORM STREQUAL "STM32H5x_FreeRTOS")
-    set(PLATFORM_DIR "stmH563ZI")
-    message(STATUS "Using STM32H5x platform with directory: ${PLATFORM_DIR}")
-elseif(EMBY_PLATFORM STREQUAL "STM32L4x_FreeRTOS")
-    set(PLATFORM_DIR "stm32l431cc")
-    message(STATUS "Using STM32L4x platform with directory: ${PLATFORM_DIR}")
-else()
-    message(FATAL_ERROR "Unsupported EMBY_PLATFORM: ${EMBY_PLATFORM}. Supported platforms are: STM32H5x_FreeRTOS, STM32L4x_FreeRTOS")
-endif()
-
-# Set the EmbyAppMachine.cc path based on platform
-set(EMBY_APP_MACHINE_PATH "src/${PLATFORM_DIR}/EmbyAppMachine.cc")
-
-# Check if the file exists
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${EMBY_APP_MACHINE_PATH}")
-    message(FATAL_ERROR "EmbyAppMachine.cc not found at: ${EMBY_APP_MACHINE_PATH}")
-endif()
+include_directories(src/* src/*/*/)
 
 message(STATUS "Using EmbyAppMachine.cc from: ${EMBY_APP_MACHINE_PATH}")
 
 # Append example project to SOURCES
 file(GLOB_RECURSE APP_SOURCES
-        "src/main.cc"
-        "${EMBY_APP_MACHINE_PATH}"
-        "src/Console/ConsoleCommands.cc"
-        "src/MainWorker.cc")
+    "src/main.cc"
+    "${EMBY_APP_MACHINE_PATH}"
+    "src/Console/ConsoleCommands.cc"
+    "src/MainWorker.cc"
+)
 
 list(APPEND SOURCES ${APP_SOURCES} ${EMBY_SOURCES})
-
 
 # Show include directories (for debugging)
 # get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
@@ -66,7 +49,6 @@ list(APPEND SOURCES ${APP_SOURCES} ${EMBY_SOURCES})
 # Project settings
 project(emby-test_${EMBY_PLATFORM} CXX C ASM)
 
-# Linker configuration
 if(LINKER_SCRIPT)
     add_link_options(-T ${LINKER_SCRIPT})
     message(STATUS "LINKER: " ${LINKER_SCRIPT})
@@ -88,29 +70,29 @@ else()
     add_executable(${PROJECT_NAME} ${SOURCES})
 endif()
 
-# Output file paths
 set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
 set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
 
 # Generate hex and binary files
-if(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.elf)
+if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.elf")
     add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
-            COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${PROJECT_NAME}.elf> ${HEX_FILE}
-            COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${PROJECT_NAME}.elf> ${BIN_FILE}
-            COMMENT "Building ${HEX_FILE} Building ${BIN_FILE}")
+        COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${PROJECT_NAME}.elf> ${HEX_FILE}
+        COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${PROJECT_NAME}.elf> ${BIN_FILE}
+        COMMENT "Building ${HEX_FILE} Building ${BIN_FILE}"
+    )
 endif()
 
 # Report size function
 function(show_object_size target)
-    if(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.elf)
+    if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.elf")
         string(REPLACE "objcopy" "size" CMAKE_OBJSIZE "${CMAKE_OBJCOPY}")
-        message(STATUS ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.elf)
-        message(STATUS ${CMAKE_OBJSIZE})
+        message(STATUS "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.elf}")
+        message(STATUS "${CMAKE_OBJSIZE}")
 
         add_custom_command(
-                TARGET ${target} POST_BUILD
-                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                COMMAND ${CMAKE_OBJSIZE} --format=berkeley --totals ${CMAKE_CURRENT_BINARY_DIR}/${target}
+            TARGET ${target} POST_BUILD
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMAND ${CMAKE_OBJSIZE} --format=berkeley --totals ${CMAKE_CURRENT_BINARY_DIR}/${target}
         )
     endif()
 endfunction()
