@@ -9,7 +9,7 @@
 
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2022 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -40,26 +40,27 @@
   */
 
 #define HAL_MODULE_ENABLED
-/*#define HAL_ADC_MODULE_ENABLED */
+
+#define HAL_ADC_MODULE_ENABLED
 /*#define HAL_CEC_MODULE_ENABLED */
 /*#define HAL_COMP_MODULE_ENABLED */
 /*#define HAL_CORDIC_MODULE_ENABLED */
 /*#define HAL_CRC_MODULE_ENABLED */
 /*#define HAL_CRYP_MODULE_ENABLED */
 /*#define HAL_DAC_MODULE_ENABLED */
-/*#define HAL_DCACHE_MODULE_ENABLED */
+#define HAL_DCACHE_MODULE_ENABLED
 /*#define HAL_DCMI_MODULE_ENABLED */
 /*#define HAL_DTS_MODULE_ENABLED */
 /*#define HAL_ETH_MODULE_ENABLED */
 /*#define HAL_FDCAN_MODULE_ENABLED */
 /*#define HAL_FMAC_MODULE_ENABLED */
-#define HAL_GTZC_MODULE_ENABLED
+/*#define HAL_GTZC_MODULE_ENABLED */
 /*#define HAL_HASH_MODULE_ENABLED */
 /*#define HAL_HCD_MODULE_ENABLED */
 /*#define HAL_IRDA_MODULE_ENABLED */
 /*#define HAL_IWDG_MODULE_ENABLED */
 /*#define HAL_I2C_MODULE_ENABLED */
-/*#define HAL_I3C_MODULE_ENABLED */
+#define HAL_I3C_MODULE_ENABLED
 /*#define HAL_I2S_MODULE_ENABLED */
 /*#define HAL_LPTIM_MODULE_ENABLED */
 /*#define HAL_NAND_MODULE_ENABLED */
@@ -72,17 +73,16 @@
 /*#define HAL_RTC_MODULE_ENABLED */
 /*#define HAL_SAI_MODULE_ENABLED */
 /*#define HAL_SD_MODULE_ENABLED */
-/*#define HAL_SDIO_MODULE_ENABLED */
 /*#define HAL_SDRAM_MODULE_ENABLED */
 /*#define HAL_MMC_MODULE_ENABLED */
 /*#define HAL_SMARTCARD_MODULE_ENABLED */
 /*#define HAL_SMBUS_MODULE_ENABLED */
 /*#define HAL_SPI_MODULE_ENABLED */
 /*#define HAL_SRAM_MODULE_ENABLED */
-/*#define HAL_TIM_MODULE_ENABLED */
+#define HAL_TIM_MODULE_ENABLED
 /*#define HAL_RAMCFG_MODULE_ENABLED */
 #define HAL_UART_MODULE_ENABLED
-/*#define HAL_USART_MODULE_ENABLED */
+#define HAL_USART_MODULE_ENABLED
 /*#define HAL_WWDG_MODULE_ENABLED */
 /*#define HAL_PSSI_MODULE_ENABLED */
 #define HAL_ICACHE_MODULE_ENABLED
@@ -149,7 +149,7 @@
                                                 in voltage and temperature.*/
 
 #if !defined  (LSI_STARTUP_TIME)
-  #define LSI_STARTUP_TIME          130UL      /*!< Time out for LSI start up, in us */
+  #define LSI_STARTUP_TIME          130UL      /*!< Time out for LSI start up, in ms */
 #endif /* LSI_STARTUP_TIME */
 
 /**
@@ -163,6 +163,7 @@
 #if !defined  (LSE_STARTUP_TIMEOUT)
   #define LSE_STARTUP_TIMEOUT    5000UL     /*!< Time out for LSE start up, in ms */
 #endif /* LSE_STARTUP_TIMEOUT */
+
 /**
   * @brief External clock source for SPI/SAI peripheral
   *        This value is used by the SPI/SAI HAL module to compute the SPI/SAI clock source
@@ -229,8 +230,9 @@
 #define  USE_HAL_LPTIM_REGISTER_CALLBACKS     0U    /* LPTIM register callback disabled     */
 #define  USE_HAL_MMC_REGISTER_CALLBACKS       0U    /* MMC register callback disabled       */
 #define  USE_HAL_NAND_REGISTER_CALLBACKS      0U    /* NAND register callback disabled      */
-#define  USE_HAL_OPAMP_REGISTER_CALLBACKS     0U    /* OPAMP register callback disabled     */
-#define  USE_HAL_OTFDEC_REGISTER_CALLBACKS    0U    /* OTFDEC register callback disabled    */
+
+#define  USE_HAL_OPAMP_REGISTER_CALLBACKS     0U    /* OTFDEC register callback disabled    */
+#define  USE_HAL_OTFDEC_REGISTER_CALLBACKS    0U    /* OPAMP register callback disabled     */
 #define  USE_HAL_PCD_REGISTER_CALLBACKS       0U    /* PCD register callback disabled       */
 #define  USE_HAL_PKA_REGISTER_CALLBACKS       0U    /* PKA register callback disabled       */
 #define  USE_HAL_RAMCFG_REGISTER_CALLBACKS    0U    /* RAMCFG register callback disabled    */
@@ -238,7 +240,6 @@
 #define  USE_HAL_RTC_REGISTER_CALLBACKS       0U    /* RTC register callback disabled       */
 #define  USE_HAL_SAI_REGISTER_CALLBACKS       0U    /* SAI register callback disabled       */
 #define  USE_HAL_SD_REGISTER_CALLBACKS        0U    /* SD register callback disabled        */
-#define  USE_HAL_SDIO_REGISTER_CALLBACKS      0U    /* SDIO register callback disabled      */
 #define  USE_HAL_SDRAM_REGISTER_CALLBACKS     0U    /* SDRAM register callback disabled     */
 #define  USE_HAL_SMARTCARD_REGISTER_CALLBACKS 0U    /* SMARTCARD register callback disabled */
 #define  USE_HAL_SMBUS_REGISTER_CALLBACKS     0U    /* SMBUS register callback disabled     */
@@ -257,15 +258,6 @@
  * Deactivated: CRC code cleaned from driver
  */
 #define USE_SPI_CRC                   0U
-
-/* ################## SDMMC peripheral configuration ######################### */
-
-#define USE_SD_TRANSCEIVER            0U
-
-/* ################## SDIO peripheral configuration ######################### */
-
-#define USE_SDIO_TRANSCEIVER          0U
-#define SDIO_MAX_IO_NUMBER            7U
 
 /* Includes ----------------------------------------------------------------------------------------------------------*/
 
@@ -340,10 +332,6 @@
 #ifdef HAL_SDRAM_MODULE_ENABLED
   #include "stm32h5xx_hal_sdram.h"
 #endif /* HAL_SDRAM_MODULE_ENABLED */
-
-#ifdef HAL_SDIO_MODULE_ENABLED
-#include "stm32h5xx_hal_sdio.h"
-#endif /* HAL_SDIO_MODULE_ENABLED */
 
 #ifdef HAL_MMC_MODULE_ENABLED
  #include "stm32h5xx_hal_mmc.h"
