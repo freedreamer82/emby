@@ -18,6 +18,8 @@ EmbyLog_MODULE_LOG_CLASS("main");
 using namespace EmbyLibs;
 using namespace EmbySystem;
 
+#define CONSOLE_UART "uart3"
+
 bool MainWorker::onErrors(EmbySystem::ErrorCode *err, EmbySystem::SystemError::Status status)
 {
     auto error = err->getDescription();
@@ -49,7 +51,7 @@ MainWorker::doWork()
     uartConfig.parity = EmbyMachine::Serial::Serial_Parity::Serial_Parity_None;
     uartConfig.stopBits = EmbyMachine::Serial::Serial_StopBits::Serial_StopBits_1;
     uartConfig.wordLen = EmbyMachine::Serial::Serial_WordLen::Serial_WordLen_8;
-    static ConsoleUart console = ConsoleUart(EmbyLog::logMaskFrom(EmbyLog::LogLevel::Debug), "uart2", &uartConfig);
+    static ConsoleUart console = ConsoleUart(EmbyLog::logMaskFrom(EmbyLog::LogLevel::Debug), CONSOLE_UART, &uartConfig);
 
     console.askLogin(false);
     static ConsoleCommandsProject::Context cc;
