@@ -1,13 +1,7 @@
-to build x86:
-mkdir -p build && cd build
-cmake -DEMBY_FOLDER=$PWD/../emby  -DEMBY_CONFIG=../src/emby_config.h -DEMBY_PLATFORM=X86_Unix ..
+# Create build directory if it doesn't exist
+mkdir -p build
+cd build
 
-to build for arm:
-
-export CUSTOM_GCC_TOOLCHAIN_PATH=<your ARM gcc folder>
-( i.e export CUSTOM_GCC_TOOLCHAIN_PATH=/mnt/DATA/gcc-arm-none-eabi-10-2020-q4-major/bin/)
-
-mkdir -p build && cd build
 cmake \
     -DEMBY_FOLDER=$PWD/../emby \
     -DEMBY_CONFIG=../src/emby_config.h \
@@ -17,3 +11,5 @@ cmake \
     -DSTM32L4x_FreeRTOS_CONF_DIR=${PWD}/../src/stm32l431cc/ \
     -DSTM32L4x_FreeRTOS_LINKER=${PWD}/../src/stm32l431cc/STM32L431CCTX_FLASH.ld \
     ..
+
+echo "Complete! Now you can run make from the build directory"

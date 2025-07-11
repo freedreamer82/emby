@@ -5,85 +5,104 @@ cmake_minimum_required(VERSION 3.17)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 
-
+# Platform-specific linker flags
 if(APPLE)
-  
+    # macOS specific settings
 else()
     set(LDFLAGS "${LDFLAGS} --gc-sections")
 endif()
 
-
-if (EMBY_FOLDER)
+# Include Emby framework
+if(EMBY_FOLDER)
     message(STATUS "including EMBY cmake:" ${EMBY_FOLDER}/emby.cmake)
     set(ENV{EMBY_FOLDER} ["${EMBY_FOLDER}"])
     include("${EMBY_FOLDER}/emby.cmake")
 endif()
 
-
+# Compiler options
 add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0)
 add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
 
+# Include directories
+include_directories(src/* src/**/)
 
+# Determine the platform-specific directory and EmbyAppMachine.cc path
+if(EMBY_PLATFORM STREQUAL "STM32H5x_FreeRTOS")
+    set(PLATFORM_DIR "stmH563ZI")
+    message(STATUS "Using STM32H5x platform with directory: ${PLATFORM_DIR}")
+elseif(EMBY_PLATFORM STREQUAL "STM32L4x_FreeRTOS")
+    set(PLATFORM_DIR "stm32l431cc")
+    message(STATUS "Using STM32L4x platform with directory: ${PLATFORM_DIR}")
+else()
+    message(FATAL_ERROR "Unsupported EMBY_PLATFORM: ${EMBY_PLATFORM}. Supported platforms are: STM32H5x_FreeRTOS, STM32L4x_FreeRTOS")
+endif()
 
-include_directories( src/* src/*/*/ )
+# Set the EmbyAppMachine.cc path based on platform
+set(EMBY_APP_MACHINE_PATH "src/${PLATFORM_DIR}/EmbyAppMachine.cc")
 
-#aapend example project to SOURCES
+# Check if the file exists
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${EMBY_APP_MACHINE_PATH}")
+    message(FATAL_ERROR "EmbyAppMachine.cc not found at: ${EMBY_APP_MACHINE_PATH}")
+endif()
+
+message(STATUS "Using EmbyAppMachine.cc from: ${EMBY_APP_MACHINE_PATH}")
+
+# Append example project to SOURCES
 file(GLOB_RECURSE APP_SOURCES
         "src/main.cc"
-        "src/EmbyAppMachine.cc"
+        "${EMBY_APP_MACHINE_PATH}"
         "src/Console/ConsoleCommands.cc"
         "src/MainWorker.cc")
 
-list (APPEND SOURCES ${APP_SOURCES} ${EMBY_SOURCES})
+list(APPEND SOURCES ${APP_SOURCES} ${EMBY_SOURCES})
 
 
-#show Include dirs
-#get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-#foreach(dir ${dirs})
-#    message(STATUS "dir='${dir}'")
-#endforeach()
+# Show include directories (for debugging)
+# get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+# foreach(dir ${dirs})
+#     message(STATUS "dir='${dir}'")
+# endforeach()
 
+# Project settings
+project(emby-test_${EMBY_PLATFORM} CXX C ASM)
 
-# project settings
-project(emby-test_${EMBY_PLATFORM}  CXX C ASM)
-
-if (LINKER_SCRIPT)
+# Linker configuration
+if(LINKER_SCRIPT)
     add_link_options(-T ${LINKER_SCRIPT})
     message(STATUS "LINKER: " ${LINKER_SCRIPT})
+
     if(LINUX)
         add_link_options(-Wl,-gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
-    elif(APPLE)
+    elseif(APPLE)
         add_link_options(-Wl, -Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
     endif()
 
     add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})
-else ()
+else()
     if(LINUX)
         add_link_options(-Wl,-gc-sections,--print-memory-usage)
-    elif(APPLE)
-       add_link_options(-Wl)
-       add_compile_options(-Werror=format)
+    elseif(APPLE)
+        add_link_options(-Wl)
+        add_compile_options(-Werror=format)
     endif()
     add_executable(${PROJECT_NAME} ${SOURCES})
 endif()
 
-
+# Output file paths
 set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
 set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
 
-
-
-if (${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.elf)
-add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${PROJECT_NAME}.elf> ${HEX_FILE}
-        COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${PROJECT_NAME}.elf> ${BIN_FILE}
-        COMMENT "Building ${HEX_FILE} Building ${BIN_FILE}")
+# Generate hex and binary files
+if(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.elf)
+    add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
+            COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${PROJECT_NAME}.elf> ${HEX_FILE}
+            COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${PROJECT_NAME}.elf> ${BIN_FILE}
+            COMMENT "Building ${HEX_FILE} Building ${BIN_FILE}")
 endif()
 
-
-## report size
+# Report size function
 function(show_object_size target)
-    if (${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.elf)
+    if(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.elf)
         string(REPLACE "objcopy" "size" CMAKE_OBJSIZE "${CMAKE_OBJCOPY}")
         message(STATUS ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.elf)
         message(STATUS ${CMAKE_OBJSIZE})
@@ -93,9 +112,8 @@ function(show_object_size target)
                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                 COMMAND ${CMAKE_OBJSIZE} --format=berkeley --totals ${CMAKE_CURRENT_BINARY_DIR}/${target}
         )
-    endif ()
-
+    endif()
 endfunction()
 
-#message(STATUS "${SOURCES}")
+# Show object size
 show_object_size(${PROJECT_NAME}.elf)
