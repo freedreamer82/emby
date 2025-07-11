@@ -5,6 +5,7 @@
 #include <EmbyThreading/Thread_Impl.hh>
 #include <EmbyThreading/Worker.hh>
 #include <stdint.h>
+#include <cstddef>
 
 namespace EmbyThreading
 {

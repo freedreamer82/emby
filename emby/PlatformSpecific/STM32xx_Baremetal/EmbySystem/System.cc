@@ -64,15 +64,15 @@ namespace EmbySystem
             return false;
     }
 
-    __attribute__((weak))   void EnterCriticalSection()
-    {
-      // do things
-    }
+    // __attribute__((weak))   void EnterCriticalSection()
+    // {
+    //   // do things
+    // }
 
-    __attribute__((weak))  void ExitCriticalSection()
-    {
-      // do things
-    }
+    // __attribute__((weak))  void ExitCriticalSection()
+    // {
+    //   // do things
+    // }
 
 }
 
