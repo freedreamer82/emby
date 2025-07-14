@@ -32,6 +32,7 @@ MainWorker::MainWorker() : m_thread(this, "Main", STACK_SIZE, PRIORITY)
     EmbySystem::SystemError::SystemErrorCallback cb;
     cb.attach(this, &MainWorker::onErrors);
     SystemError::get().setErrorCallback(cb);
+    m_thread.start();
 }
 
 MainWorker::~MainWorker()
@@ -53,11 +54,13 @@ MainWorker::doWork()
     uartConfig.wordLen = EmbyMachine::Serial::Serial_WordLen::Serial_WordLen_8;
     static ConsoleUart console = ConsoleUart(EmbyLog::logMaskFrom(EmbyLog::LogLevel::Debug), CONSOLE_UART, &uartConfig);
 
-    console.askLogin(false);
+    // console.askLogin(false);
     static ConsoleCommandsProject::Context cc;
     static ConsoleCommandsProject appCommands(cc);
     console.setApplicationCommands(&appCommands);
+#ifdef EMBY_RTOS
     ConsoleWorker::get().addConsole(&console);
+#endif
 
 #elif EMBY_BUILD_X86
 
@@ -73,14 +76,20 @@ MainWorker::doWork()
     log_info("Starting telnet localhost:3000");
 #endif
 
+
     int errcode = 0;
     while (true)
     {
+#ifndef EMBY_RTOS
+        console.doStep();
+        EmbySystem::delayMs(50);
+#else
         log_info("This is a log Test");
         EmbySystem::delayMs(5000);
         log_info("Fire Error Test");
         ErrorCode err{errcode++, upTimeMs(), "TestError"};
         SystemError::get().addError(err);
+#endif
     }
 
     EmbySystem::reboot();

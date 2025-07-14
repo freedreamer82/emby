@@ -371,7 +371,7 @@ namespace EmbyMachine
             {
                 m_impl.m_unit = UART5;
             }*/
-
+        EmbyDebug_ASSERT(m_impl.m_unit.Instance != nullptr);
         m_impl.m_unit.Init.WordLength = UART_WORDLENGTH_8B;
         m_impl.m_unit.Init.StopBits = UART_STOPBITS_1;
         m_impl.m_unit.Init.Parity = UART_PARITY_NONE;
