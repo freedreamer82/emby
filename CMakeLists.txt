@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.17)
 
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_VERSION 1)
-cmake_minimum_required(VERSION 3.17)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
@@ -16,7 +15,7 @@ endif()
 
 # Include Emby framework
 if(EMBY_FOLDER)
-    message(STATUS "including EMBY cmake:" ${EMBY_FOLDER}/emby.cmake)
+    message(STATUS "including EMBY cmake: ${EMBY_FOLDER}/emby.cmake")
     set(ENV{EMBY_FOLDER} ["${EMBY_FOLDER}"])
     include("${EMBY_FOLDER}/emby.cmake")
 endif()
@@ -28,35 +27,36 @@ add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
 # Include directories
 include_directories(src/* src/*/*/)
 
-message(STATUS "Using EmbyAppMachine.cc from: ${EMBY_APP_MACHINE_PATH}")
+if("${EMBY_PLATFORM}" STREQUAL "X86_Unix")
+    message(STATUS "Including APP x86 PLATFORM")
+    include("src/x86/app-platform.cmake")
+elseif("${EMBY_PLATFORM}" STREQUAL "STM32xx_Baremetal")
+    if("${STM32xx_Baremetal_FAMILY}" STREQUAL "STM32H5xx")
+        message(STATUS "Including APP H5 PLATFORM")
+        include("src/platform/arm/ST/nucleo_stm32H563ZI/app-platform.cmake")
+    endif()
+endif()
 
 # Append example project to SOURCES
 file(GLOB_RECURSE APP_SOURCES
     "src/main.cc"
-    "${EMBY_APP_MACHINE_PATH}"
     "src/Console/ConsoleCommands.cc"
     "src/MainWorker.cc"
 )
 
 list(APPEND SOURCES ${APP_SOURCES} ${EMBY_SOURCES})
 
-# Show include directories (for debugging)
-# get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-# foreach(dir ${dirs})
-#     message(STATUS "dir='${dir}'")
-# endforeach()
-
 # Project settings
 project(emby-test_${EMBY_PLATFORM} CXX C ASM)
 
 if(LINKER_SCRIPT)
     add_link_options(-T ${LINKER_SCRIPT})
-    message(STATUS "LINKER: " ${LINKER_SCRIPT})
+    message(STATUS "LINKER: ${LINKER_SCRIPT}")
 
     if(LINUX)
         add_link_options(-Wl,-gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
     elseif(APPLE)
-        add_link_options(-Wl, -Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
+        add_link_options(-Wl,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
     endif()
 
     add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})

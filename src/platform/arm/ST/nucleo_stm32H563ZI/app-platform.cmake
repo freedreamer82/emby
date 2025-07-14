@@ -5,14 +5,14 @@ cmake_minimum_required(VERSION 3.17)
 message(STATUS "app-platform.cmake for H5..")
 
 include_directories(
-        "${CMAKE_SOURCE_DIR}/src/stmH563ZI"
-        "${CMAKE_SOURCE_DIR}/src/stmH563ZI/conf"
+        "${CMAKE_SOURCE_DIR}/src/platform/arm/ST/nucleo_stm32H563ZI"
+        "${CMAKE_SOURCE_DIR}/src/platform/arm/ST/nucleo_stm32H563ZI/conf"
 )
 
 file(GLOB_RECURSE APP_SOURCES
-        "${CMAKE_SOURCE_DIR}/src/stmH563ZI/EmbyAppMachine.cc"
-        "${CMAKE_SOURCE_DIR}/src/stmH563ZI/system_stm32h5xx.c"
-        "${CMAKE_SOURCE_DIR}/src/stmH563ZI/stm32h5xx_it.c"
+        "${CMAKE_SOURCE_DIR}/src/platform/arm/ST/nucleo_stm32H563ZI/EmbyAppMachine.cc"
+        "${CMAKE_SOURCE_DIR}/src/platform/arm/ST/nucleo_stm32H563ZI/system_stm32h5xx.c"
+        "${CMAKE_SOURCE_DIR}/src/platform/arm/ST/nucleo_stm32H563ZI/stm32h5xx_it.c"
 )
 
 # RTOS selection logic (commented out)

@@ -11,10 +11,9 @@ cmake \
     -DSTM32xx_Baremetal_DEVICE=STM32H563xx \
     -DSTM32xx_Baremetal_FAMILY=STM32H5xx \
     -DEMBY_PLATFORM=STM32xx_Baremetal \
-    -DEMBY_APP_MACHINE_PATH=src/stmH563ZI/EmbyAppMachine.cc \
-    -DSTM32xx_Baremetal_STARTUP=${PWD}/../src/stmH563ZI/startup_stm32h563zitx.s \
-    -DSTM32xx_Baremetal_CONF_DIR=${PWD}/../src/stmH563ZI/ \
-    -DSTM32xx_Baremetal_LINKER=${PWD}/../src/stmH563ZI/STM32H563ZITX_FLASH.ld \
+    -DSTM32xx_Baremetal_STARTUP=${PWD}/../src/platform/arm/ST/nucleo_stm32H563ZI/startup_stm32h563zitx.s \
+    -DSTM32xx_Baremetal_CONF_DIR=${PWD}/../src/platform/arm/ST/nucleo_stm32H563ZI/ \
+    -DSTM32xx_Baremetal_LINKER=${PWD}/../src/platform/arm/ST/nucleo_stm32H563ZI/STM32H563ZITX_FLASH.ld \
     ..
 
 # Check if cmake was successful
