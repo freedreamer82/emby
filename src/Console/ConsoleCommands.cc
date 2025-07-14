@@ -57,15 +57,16 @@ CommandErrorCode ConsoleCommandsProject::cmdHandler_date(Console &console,
                                                          char const *const *args,
                                                          int argsNo)
 {
-    EmbyTime::DateTime dateTime;
-    EmbyTime::Clock::get().getTime(dateTime);
-    EmbyTime::TimeStamp seconds;
-    EmbyTime::DateTime::getTimeStamp(seconds, dateTime);
+    // TODO: Check Clock implementation
+    // EmbyTime::DateTime dateTime;
+    // EmbyTime::Clock::get().getTime(dateTime);
+    // EmbyTime::TimeStamp seconds;
+    // EmbyTime::DateTime::getTimeStamp(seconds, dateTime);
 
-    console.printf("date UTC ts: %d ", seconds);
-    console.printf("%d/%d/%d @ %d:%d:%s", dateTime.getDate().getDay(), dateTime.getDate().getMonth(),
-                   dateTime.getDate().getYear(),
-                   dateTime.getTime().getHours(), dateTime.getTime().getMinutes(), dateTime.getTime().getSeconds());
+    // console.printf("date UTC ts: %d ", seconds);
+    // console.printf("%d/%d/%d @ %d:%d:%s", dateTime.getDate().getDay(), dateTime.getDate().getMonth(),
+    //                dateTime.getDate().getYear(),
+    //                dateTime.getTime().getHours(), dateTime.getTime().getMinutes(), dateTime.getTime().getSeconds());
 
     return EmbyConsole::NO_ERR;
 
