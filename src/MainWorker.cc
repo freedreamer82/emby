@@ -1,4 +1,3 @@
-
 #include "MainWorker.hh"
 #include <EmbyConsole/ConsoleWorker.hh>
 #include <EmbyConsole/ConsoleUart.hh>
@@ -39,12 +38,9 @@ MainWorker::~MainWorker()
 {
 }
 
-[[noreturn]] void
-MainWorker::doWork()
-{
-
 #ifdef EMBY_BUILD_ARM
-
+static void processArm()
+{
     EmbyMachine::Serial::Serial_Config uartConfig;
     uartConfig.baudRate = EmbyMachine::Serial::Serial_BaudRate::Serial_BaudRate_115200;
     uartConfig.flowCtrl = EmbyMachine::Serial::Serial_FlowCtrl::Serial_FlowCtrl_None;
@@ -58,39 +54,54 @@ MainWorker::doWork()
     static ConsoleCommandsProject::Context cc;
     static ConsoleCommandsProject appCommands(cc);
     console.setApplicationCommands(&appCommands);
+
 #ifdef EMBY_RTOS
     ConsoleWorker::get().addConsole(&console);
 #endif
 
-#elif EMBY_BUILD_X86
+    while (true)
+    {
+#ifdef EMBY_RTOS
+        console.doStep();
+#endif
+        EmbySystem::delayMs(50);
+    }
+}
 
+#elif EMBY_BUILD_X86
+static void processx86()
+{
     static StdLogProcessor logger(EmbyLog::logMaskFrom(EmbyLog::LogLevel::Info));
     EmbyLog::LogBus::get().registerProcessor(&logger);
-
+    
     static EmbyConsole::ConsoleTelnet console = EmbyConsole::ConsoleTelnet(EmbyLog::logMaskFrom(EmbyLog::LogLevel::Debug), 3000, 2);
-
-    //    static ConsoleCommandsProject::Context cc;
-    //    static ConsoleCommandsProject appCommands(cc);
-    //    console.setApplicationCommands(&appCommands);
-    //    console.start();
+    
+    // static ConsoleCommandsProject::Context cc;
+    // static ConsoleCommandsProject appCommands(cc);
+    // console.setApplicationCommands(&appCommands);
+    // console.start();
     log_info("Starting telnet localhost:3000");
-#endif
-
-
+    
     int errcode = 0;
     while (true)
     {
-#ifndef EMBY_RTOS
-        console.doStep();
         EmbySystem::delayMs(50);
-#else
         log_info("This is a log Test");
         EmbySystem::delayMs(5000);
         log_info("Fire Error Test");
         ErrorCode err{errcode++, upTimeMs(), "TestError"};
         SystemError::get().addError(err);
-#endif
     }
+}
+#endif
+
+[[noreturn]] void MainWorker::doWork()
+{
+#ifdef EMBY_BUILD_ARM
+    processArm();
+#elif EMBY_BUILD_X86
+    processx86();
+#endif
 
     EmbySystem::reboot();
 }

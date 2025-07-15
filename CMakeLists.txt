@@ -29,7 +29,7 @@ include_directories(src/* src/*/*/)
 
 if("${EMBY_PLATFORM}" STREQUAL "X86_Unix")
     message(STATUS "Including APP x86 PLATFORM")
-    include("src/x86/app-platform.cmake")
+    include("src/platform/x86/app-platform.cmake")
 elseif("${EMBY_PLATFORM}" STREQUAL "STM32xx_Baremetal")
     if("${STM32xx_Baremetal_FAMILY}" STREQUAL "STM32H5xx")
         message(STATUS "Including APP H5 PLATFORM")
