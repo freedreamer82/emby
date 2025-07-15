@@ -1,9 +1,9 @@
+# Clean and build for STM32H5 development
 ./cleanall.sh
 
 # Create build directory if it doesn't exist
 mkdir -p build
 cd build
-
 
 cmake \
     -DEMBY_FOLDER=$PWD/../emby \
