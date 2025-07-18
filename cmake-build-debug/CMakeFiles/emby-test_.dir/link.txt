@@ -1,1 +1,0 @@
-/usr/bin/c++ -g "CMakeFiles/emby-test_.dir/src/Console/ConsoleCommands.cc.obj" "CMakeFiles/emby-test_.dir/src/MainWorker.cc.obj" "CMakeFiles/emby-test_.dir/src/main.cc.obj" -o emby-test_ 
