@@ -59,6 +59,7 @@ namespace EmbyTime
 
 		private:
 			ClockImpl m_impl;
+            bool isRTCRunning() const;
 	};
 
 }
