@@ -50,7 +50,7 @@ static void processArm()
     uartConfig.wordLen = EmbyMachine::Serial::Serial_WordLen::Serial_WordLen_8;
     static ConsoleUart console = ConsoleUart(EmbyLog::logMaskFrom(EmbyLog::LogLevel::Debug), CONSOLE_UART, &uartConfig);
 
-    // console.askLogin(false);
+    console.askLogin(true);
     static ConsoleCommandsProject::Context cc;
     static ConsoleCommandsProject appCommands(cc);
     console.setApplicationCommands(&appCommands);

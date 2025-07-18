@@ -1,0 +1,3 @@
+/home/mark/tp/emby/cmake-build-debug/CMakeFiles/emby-test_.dir
+/home/mark/tp/emby/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/mark/tp/emby/cmake-build-debug/CMakeFiles/rebuild_cache.dir

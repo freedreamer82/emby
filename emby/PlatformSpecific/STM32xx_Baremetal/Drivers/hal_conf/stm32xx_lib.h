@@ -24,6 +24,7 @@
 
 #include <stdint.h>
 #include "stm32h5xx_hal.h"
+#include "stm32h5xx_hal_rtc.h"
 #include "stm32h5xx_ll_usart.h"
 #include "stm32h5xx.h"
 
@@ -31,6 +32,7 @@
 
 #include <stdint.h>
 #include "stm32h7xx_hal.h"
+#include "stm32h7xx_hal_rtc.h"
 #include "stm32h7xx_ll_usart.h"
 #include "stm32h7xx.h"
 

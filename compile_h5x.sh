@@ -8,6 +8,7 @@ cd build
 cmake \
     -DEMBY_FOLDER=$PWD/../emby \
     -DEMBY_CONFIG=../src/emby_config.h \
+    -DCUSTOM_NAME_EXEC="test_STM32H563xx" \
     -DSTM32xx_Baremetal_DEVICE=STM32H563xx \
     -DSTM32xx_Baremetal_FAMILY=STM32H5xx \
     -DEMBY_PLATFORM=STM32xx_Baremetal \

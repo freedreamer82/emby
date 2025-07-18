@@ -20,7 +20,7 @@ file(GLOB_RECURSE APP_SOURCES
     "${CMAKE_SOURCE_DIR}/src/platform/arm/ST/nucleo_stm32H563ZI/system_stm32h5xx.c"
     "${CMAKE_SOURCE_DIR}/src/platform/arm/ST/nucleo_stm32H563ZI/stm32h5xx_it.c"
 )
-
+add_compile_definitions(EMBY_BUILD_ARM EMBY_RTOS)
 # RTOS selection logic (commented out)
 # if (NOT DEFINED EMBY_RTOS OR ("${EMBY_RTOS}" STREQUAL ""))
 #     message(STATUS "NO RTOS Support!")
