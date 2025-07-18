@@ -17,6 +17,8 @@
 
 #include <EmbyTime/TimeStamp.hh>
 #include <EmbyLibs/String.hh>
+#include <type_traits>
+#include <stdexcept>
 
 namespace EmbyTime
 {
@@ -53,6 +55,21 @@ namespace EmbyTime
 	    MonthOfYear_Dec
 	};
 
+    // Overload the subtraction operator for MonthOfYear
+    constexpr MonthOfYear operator-(MonthOfYear lhs, int rhs) {
+        using UnderlyingType = std::underlying_type_t<MonthOfYear>;
+        int result = static_cast<UnderlyingType>(lhs) - rhs;
+
+        // Wrap around to ensure the result is within the valid range (1 to 12)
+        if (result < 1) {
+            result = 12 + (result % 12);
+        } else if (result > 12) {
+            result = (result - 1) % 12 + 1;
+        }
+
+        return static_cast<MonthOfYear>(result);
+    }
+
 	class Date
 	{
 		public:
@@ -71,10 +88,10 @@ namespace EmbyTime
 			}
 
 			DayOfWeek
-                        getDayOfWeek() const
-                        {
-                                return m_dayOfweek;
-                        }
+            getDayOfWeek() const
+            {
+                    return m_dayOfweek;
+            }
 
 			MonthOfYear
 			getMonth() const
@@ -91,7 +108,6 @@ namespace EmbyTime
 			static EmbyTime::DayOfWeek computeDayOfWeek(uint16_t y, uint8_t m, uint8_t d);
 
                         static EmbyLibs::String dayOfWeekToString(EmbyTime::DayOfWeek day);
-
 
 		private:
 			DayOfMonth      m_day;

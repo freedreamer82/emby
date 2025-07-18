@@ -78,6 +78,4 @@ namespace EmbyTime
             return EmbyLibs::String("unkwown");
         }
 
-
-
 }

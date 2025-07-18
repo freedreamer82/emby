@@ -76,21 +76,23 @@ static void processx86()
     
     static EmbyConsole::ConsoleTelnet console = EmbyConsole::ConsoleTelnet(EmbyLog::logMaskFrom(EmbyLog::LogLevel::Debug), 3000, 2);
     
-    // static ConsoleCommandsProject::Context cc;
-    // static ConsoleCommandsProject appCommands(cc);
-    // console.setApplicationCommands(&appCommands);
-    // console.start();
+    static ConsoleCommandsProject::Context cc;
+    static ConsoleCommandsProject appCommands(cc);
+    console.setApplicationCommands(&appCommands);
+    //console.start();
     log_info("Starting telnet localhost:3000");
     
     int errcode = 0;
     while (true)
     {
+//        EmbySystem::delayMs(50);
+//        log_info("This is a log Test");
+//        EmbySystem::delayMs(5000);
+//        log_info("Fire Error Test");
+//        ErrorCode err{errcode++, upTimeMs(), "TestError"};
+//        SystemError::get().addError(err);
+        //console.doStep();
         EmbySystem::delayMs(50);
-        log_info("This is a log Test");
-        EmbySystem::delayMs(5000);
-        log_info("Fire Error Test");
-        ErrorCode err{errcode++, upTimeMs(), "TestError"};
-        SystemError::get().addError(err);
     }
 }
 #endif
