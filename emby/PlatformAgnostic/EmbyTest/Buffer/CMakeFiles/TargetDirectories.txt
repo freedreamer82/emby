@@ -1,3 +1,0 @@
-/home/mark/tp/emby/emby/PlatformAgnostic/EmbyTest/Buffer/CMakeFiles/emby-test-buffer.dir
-/home/mark/tp/emby/emby/PlatformAgnostic/EmbyTest/Buffer/CMakeFiles/edit_cache.dir
-/home/mark/tp/emby/emby/PlatformAgnostic/EmbyTest/Buffer/CMakeFiles/rebuild_cache.dir
