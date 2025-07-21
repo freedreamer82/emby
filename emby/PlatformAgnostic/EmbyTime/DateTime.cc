@@ -152,7 +152,7 @@ namespace EmbyTime
         EmbyLibs::sprintf(out,
                           "%d/%d/%d %d:%d:%d",
                           dateTime.getDate().getDay(),
-                          dateTime.getDate().getMonth(),
+                          (int)dateTime.getDate().getMonth(),
                           dateTime.getDate().getYear(),
                           dateTime.getTime().getHours(),
                           dateTime.getTime().getMinutes(),

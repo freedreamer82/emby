@@ -51,7 +51,7 @@ namespace EmbyTime
         getTimeStamp(TimeStamp &ts, DateTime &dateTime);
 
         /*
-        * Class Method to get TimeStamp from a DateTime
+        * Class Method to get DateTime from a TimeStamp
         * */
         static bool
         getDateTime(DateTime &dt, TimeStamp &ts, uint16_t startYear = TIME_DEFAULT_YEAR);

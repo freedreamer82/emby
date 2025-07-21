@@ -43,10 +43,10 @@ namespace EmbyTime
 			}
 
 			uint32_t
-                        getMillis() const
-                        {
-                                return m_millis;
-                        }
+            getMillis() const
+            {
+                    return m_millis;
+            }
 
 			Min
 			getMinutes() const

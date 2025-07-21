@@ -23,7 +23,7 @@ namespace EmbyTime
             return false;
 
         std::tm tmStruct = {};
-        if (!localtime_r(&now, &tmStruct))
+        if (!gmtime_r(&now, &tmStruct))
             return false;
 
         auto y = tmStruct.tm_year + BASE_YEAR_LINUX;
@@ -53,7 +53,7 @@ namespace EmbyTime
 
         std::tm tmStruct = {};
         tmStruct.tm_year = dateTime.getDate().getYear() - BASE_YEAR_LINUX;
-        tmStruct.tm_mon = static_cast<int>(dateTime.getDate().getMonth() - 1); // tm_mon is 0-based
+        tmStruct.tm_mon = static_cast<uint8_t>(dateTime.getDate().getMonth() - 1); // tm_mon is 0-based
         tmStruct.tm_mday = dateTime.getDate().getDay();
         tmStruct.tm_hour = dateTime.getTime().getHours();
         tmStruct.tm_min = dateTime.getTime().getMinutes();
@@ -68,7 +68,7 @@ namespace EmbyTime
         tv.tv_sec = newTime;
         tv.tv_usec = 0;
 
-        // Setting system time requires root privileges
+        // Setting system time should require root privileges
         if (settimeofday(&tv, nullptr) != 0)
             return false;
 
