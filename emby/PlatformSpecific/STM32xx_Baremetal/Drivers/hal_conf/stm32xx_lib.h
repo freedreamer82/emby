@@ -36,6 +36,12 @@
 #include "stm32h7xx_ll_usart.h"
 #include "stm32h7xx.h"
 
+#elif defined(STM32N6xx)
+#include <stdint.h>
+#include "stm32n6xx_hal.h"
+#include "stm32n6xx_ll_usart.h"
+#include "stm32n6xx.h"
+
 #else
 #error "compiler error, select your STM family"
 #endif
