@@ -49,6 +49,41 @@ namespace EmbyTime
             return (EmbyTime::DayOfWeek) day;
         }
 
+        bool Date::isValid() const
+        {
+            // Check if the day is valid for the given month and year
+            if (m_day < 1 || m_day > 31)
+                return false;
+
+            if (m_month < EmbyTime::MonthOfYear::MonthOfYear_Jan ||
+                m_month > EmbyTime::MonthOfYear::MonthOfYear_Dec)
+                return false;
+
+            // Check for February and leap years
+            if (m_month == EmbyTime::MonthOfYear::MonthOfYear_Feb)
+            {
+                if ((m_year % 4 == 0 && m_year % 100 != 0) || (m_year % 400 == 0))
+                {
+                    return m_day <= 29; // Leap year
+                }
+                else
+                {
+                    return m_day <= 28; // Non-leap year
+                }
+            }
+
+            // Check for months with 30 days
+            if ((m_month == EmbyTime::MonthOfYear::MonthOfYear_Apr ||
+                 m_month == EmbyTime::MonthOfYear::MonthOfYear_Jun ||
+                 m_month == EmbyTime::MonthOfYear::MonthOfYear_Sep ||
+                 m_month == EmbyTime::MonthOfYear::MonthOfYear_Nov) && m_day > 30)
+            {
+                return false;
+            }
+
+            return true; // Valid date
+        }
+
         EmbyLibs::String Date::dayOfWeekToString(EmbyTime::DayOfWeek day)
         {
             switch (day)

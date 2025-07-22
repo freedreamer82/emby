@@ -42,7 +42,6 @@ int main()
         assert(result.getTime().getMinutes() == 0);
         assert(result.getTime().getSeconds() == 0);
     }
-
     //
     // TEST 2: Leap year (2000-02-29)
     //
@@ -64,7 +63,6 @@ int main()
         assert(result.getTime().getMinutes() == 34);
         assert(result.getTime().getSeconds() == 56);
     }
-
     //
     // TEST 3: Date to timestamp conversion
     //
@@ -94,7 +92,6 @@ int main()
         assert(result.getTime().getMinutes() == 45);
         assert(result.getTime().getSeconds() == 0);
     }
-
     //
     // TEST 5: Timestamp to dateOfMonth conversion
     //
@@ -108,7 +105,6 @@ int main()
         assert(date.getDate().getDay() == 1);
         assert(date.getDate().getDayOfWeek() == DayOfWeek::Friday); // Should match the day of the week
     }
-
     //
     // TEST 6: Print output format
     //
@@ -121,9 +117,8 @@ int main()
         std::cout << "Formatted: " << str.c_str() << std::endl;
         assert(str == "4/7/2025 10:15:30");
     }
-
     //
-    // TEST 8: Invalid leap day (should not exist: 2019-02-29)
+    // TEST 7: Invalid leap day (should not exist: 2019-02-29)
     //
     {
         Date badDate((DayOfMonth)29, (MonthOfYear)2, 2019, (DayOfWeek)5);
@@ -133,15 +128,7 @@ int main()
         // This will pass in your implementation, even though it's not a valid date
         // Suggestion: add validation if needed
         bool ok = DateTime::getTimeStamp(ts, dt);
-        assert(ok);
-
-        DateTime roundTrip;
-        // This will convert to 1st March 2019 instead, or something close
-        ok = DateTime::getDateTime(roundTrip, ts, 1970);
-        assert(ok);
-        auto strDate = DateTime::dateTimeToString(roundTrip);
-        std::cout << "Round trip date: " << strDate.c_str() << std::endl;
-
+        assert(ok == false); // Should not be valid
     }
 
     std::cout << "\nALL DateTime TESTS PASSED!" << std::endl;

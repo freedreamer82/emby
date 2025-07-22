@@ -104,10 +104,13 @@ namespace EmbyTime
 			{
 				return m_year;
 			}
+            bool
+            isValid() const;
 
 			static EmbyTime::DayOfWeek computeDayOfWeek(uint16_t y, uint8_t m, uint8_t d);
 
                         static EmbyLibs::String dayOfWeekToString(EmbyTime::DayOfWeek day);
+
 
 		private:
 			DayOfMonth      m_day;
