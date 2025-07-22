@@ -42,10 +42,14 @@ extern "C" {
   * @{
   */
 
-#if defined(STM32N647xx)
-  #include "partition_stm32n647xx.h"
-#elif defined(STM32N657xx)
+#if defined(STM32N657xx)
   #include "partition_stm32n657xx.h"
+#elif defined(STM32N655xx)
+  #include "partition_stm32n655xx.h"
+#elif defined(STM32N647xx)
+  #include "partition_stm32n647xx.h"
+#elif defined(STM32N645xx)
+  #include "partition_stm32n645xx.h"
 #else
   #error "Please select first the target STM32N6xx device used in your application (in stm32n6xx.h file)"
 #endif
