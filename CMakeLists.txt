@@ -50,14 +50,8 @@ file(GLOB_RECURSE APP_SOURCES
 list(APPEND SOURCES ${APP_SOURCES} ${EMBY_SOURCES})
 
 # Project settings
+project(emby-test_${EMBY_PLATFORM}_${STM32xx_Baremetal_DEVICE} CXX C ASM)
 
-if ("${EMBY_PLATFORM}" STREQUAL "X86_Unix")
-    project(emby-test_${EMBY_PLATFORM} CXX C ASM)
-elseif ("${EMBY_PLATFORM}" STREQUAL "STM32xx_Baremetal")
-    project(emby-test_${EMBY_PLATFORM}_${STM32xx_Baremetal_DEVICE} CXX C ASM)
-else()
-    project(emby-test CXX C ASM)
-endif()
 
 if(LINKER_SCRIPT)
     add_link_options(-T ${LINKER_SCRIPT})
