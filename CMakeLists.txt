@@ -34,6 +34,9 @@ elseif("${EMBY_PLATFORM}" STREQUAL "STM32xx_Baremetal")
     if("${STM32xx_Baremetal_FAMILY}" STREQUAL "STM32H5xx")
         message(STATUS "Including APP H5 PLATFORM")
         include("src/platform/arm/ST/nucleo_stm32H563ZI/app-platform.cmake")
+    elseif ("${STM32xx_Baremetal_FAMILY}" STREQUAL "STM32H7xx")
+        message(STATUS "Including APP H7 PLATFORM")
+        include("src/platform/arm/ST/nucleo_stm32H743ZI/app-platform.cmake")
     endif()
 endif()
 
@@ -48,6 +51,7 @@ list(APPEND SOURCES ${APP_SOURCES} ${EMBY_SOURCES})
 
 # Project settings
 project(emby-test_${EMBY_PLATFORM} CXX C ASM)
+
 
 if(LINKER_SCRIPT)
     add_link_options(-T ${LINKER_SCRIPT})
@@ -70,8 +74,23 @@ else()
     add_executable(${PROJECT_NAME} ${SOURCES})
 endif()
 
-set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
-set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
+
+if (${EMBY_PLATFORM} STREQUAL "STM32xx_Baremetal")
+    set(CUSTOM_NAME_EXEC "embt-test_${EMBY_PLATFORM}_${STM32xx_Baremetal_DEVICE}")
+endif ()
+
+if (CUSTOM_NAME_EXEC)
+    message(STATUS "change exec name in: " ${CUSTOM_NAME_EXEC})
+    set_target_properties(${PROJECT_NAME}.elf PROPERTIES OUTPUT_NAME "${CUSTOM_NAME_EXEC}.elf")
+    set(HEX_FILE ${PROJECT_BINARY_DIR}/${CUSTOM_NAME_EXEC}.hex)
+    set(BIN_FILE ${PROJECT_BINARY_DIR}/${CUSTOM_NAME_EXEC}.bin)
+else()
+    set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
+    set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
+endif ()
+
+
+
 
 # Generate hex and binary files
 if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.elf")

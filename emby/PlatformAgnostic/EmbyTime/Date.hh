@@ -17,6 +17,8 @@
 
 #include <EmbyTime/TimeStamp.hh>
 #include <EmbyLibs/String.hh>
+#include <type_traits>
+#include <stdexcept>
 
 namespace EmbyTime
 {
@@ -71,10 +73,10 @@ namespace EmbyTime
 			}
 
 			DayOfWeek
-                        getDayOfWeek() const
-                        {
-                                return m_dayOfweek;
-                        }
+            getDayOfWeek() const
+            {
+                    return m_dayOfweek;
+            }
 
 			MonthOfYear
 			getMonth() const
@@ -87,6 +89,8 @@ namespace EmbyTime
 			{
 				return m_year;
 			}
+            bool
+            isValid() const;
 
 			static EmbyTime::DayOfWeek computeDayOfWeek(uint16_t y, uint8_t m, uint8_t d);
 

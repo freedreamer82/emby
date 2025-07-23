@@ -37,6 +37,7 @@ namespace EmbyTime
 			 * Set System Clock from DateTime
 			 * @param datetime time to be set
 			 * */
+            ~Clock();
 			bool
 			setTime( DateTime& datetime) const;
 
@@ -58,6 +59,7 @@ namespace EmbyTime
 
 		private:
 			ClockImpl m_impl;
+            bool isRunning() const;
 	};
 
 }

@@ -57,19 +57,41 @@ CommandErrorCode ConsoleCommandsProject::cmdHandler_date(Console &console,
                                                          char const *const *args,
                                                          int argsNo)
 {
-    // TODO: Check Clock implementation
-    // EmbyTime::DateTime dateTime;
-    // EmbyTime::Clock::get().getTime(dateTime);
-    // EmbyTime::TimeStamp seconds;
-    // EmbyTime::DateTime::getTimeStamp(seconds, dateTime);
+     EmbyTime::DateTime dateTime;
+     if (argsNo > 1 && std::strcmp(args[0], "set") == 0) {
+         if (argsNo < 2) {
+             console.printf("Usage: %s set <date-time>", command);
+             console.println();
+             return EmbyConsole::CMD_NOT_FOUND;
+         }
+         // args[1] is the date time string
+         console.printf("Setting time to: %s", args[1]);
+         console.println();
+         EmbyTime::TimeStamp ts = (EmbyTime::TimeStamp)atoi(args[1]);
 
-    // console.printf("date UTC ts: %d ", seconds);
-    // console.printf("%d/%d/%d @ %d:%d:%s", dateTime.getDate().getDay(), dateTime.getDate().getMonth(),
-    //                dateTime.getDate().getYear(),
-    //                dateTime.getTime().getHours(), dateTime.getTime().getMinutes(), dateTime.getTime().getSeconds());
+         if(!EmbyTime::Clock::get().setTime(ts)){
+                console.printf("Failed to set time");
+                console.println();
+         }
+     }
+     else{
+         if (!EmbyTime::Clock::get().getTime(dateTime))
+         {
+             console.printf("Failed to read time");
+             console.println();
+         }
+         EmbyTime::TimeStamp seconds;
+         EmbyTime::DateTime::getTimeStamp(seconds, dateTime);
+
+         console.printf("date UTC Timestamp: %d ", seconds);
+         console.println();
+         console.printf("%d/%d/%d @ %d:%d:%d", dateTime.getDate().getDay(), (int)dateTime.getDate().getMonth(),
+                        dateTime.getDate().getYear(),
+                        dateTime.getTime().getHours(), dateTime.getTime().getMinutes(), dateTime.getTime().getSeconds());
+         console.println();
+     }
 
     return EmbyConsole::NO_ERR;
-
 }
 
 

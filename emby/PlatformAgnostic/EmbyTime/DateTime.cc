@@ -21,7 +21,12 @@ namespace EmbyTime
     bool
     DateTime::getTimeStamp(TimeStamp &ts, DateTime &dateTime)
     {
-        /* Number of days from begin of the non Leap-year*/
+
+        if (!dateTime.getDate().isValid() || !dateTime.getTime().isValid())
+        {
+            return false;
+        }
+
         /* Number of days from begin of the non Leap-year*/
         uint16_t
         constexpr monthDays[] = {0U, 0U, 31U, 59U, 90U, 120U, 151U, 181U, 212U, 243U, 273U, 304U, 334U};
@@ -38,7 +43,7 @@ namespace EmbyTime
         /* Add days in given month. We subtract the current day as it is
          * represented in the hours, minutes and seconds field*/
         seconds += (dateTime.getDate().getDay() - 1);
-        /* For leap year if month less than or equal to Febraury, decrement day counter*/
+        /* For leap year if month less than or equal to February, decrement day counter*/
         if ((!(dateTime.getDate().getYear() & 3U)) && (month <= 2U))
         {
             seconds--;
@@ -147,12 +152,16 @@ namespace EmbyTime
 
     EmbyLibs::String DateTime::dateTimeToString(DateTime &dateTime)
     {
+        if (!dateTime.getDate().isValid() || !dateTime.getTime().isValid())
+        {
+            return "";
+        }
         // Wed Jan 26 14:04:54 2022
         EmbyLibs::String out;
         EmbyLibs::sprintf(out,
                           "%d/%d/%d %d:%d:%d",
                           dateTime.getDate().getDay(),
-                          dateTime.getDate().getMonth(),
+                          (int)dateTime.getDate().getMonth(),
                           dateTime.getDate().getYear(),
                           dateTime.getTime().getHours(),
                           dateTime.getTime().getMinutes(),
