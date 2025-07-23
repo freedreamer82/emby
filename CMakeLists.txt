@@ -50,7 +50,14 @@ file(GLOB_RECURSE APP_SOURCES
 list(APPEND SOURCES ${APP_SOURCES} ${EMBY_SOURCES})
 
 # Project settings
-project(emby-test_${EMBY_PLATFORM} CXX C ASM)
+
+if ("${EMBY_PLATFORM}" STREQUAL "X86_Unix")
+    project(emby-test_${EMBY_PLATFORM} CXX C ASM)
+elseif ("${EMBY_PLATFORM}" STREQUAL "STM32xx_Baremetal")
+    project(emby-test_${EMBY_PLATFORM}_${STM32xx_Baremetal_DEVICE} CXX C ASM)
+else()
+    project(emby-test CXX C ASM)
+endif()
 
 if(LINKER_SCRIPT)
     add_link_options(-T ${LINKER_SCRIPT})
@@ -73,17 +80,9 @@ else()
     add_executable(${PROJECT_NAME} ${SOURCES})
 endif()
 
-if (CUSTOM_NAME_EXEC)
-    message(STATUS "change exec name in: " ${CUSTOM_NAME_EXEC})
-    set_target_properties(${PROJECT_NAME}.elf PROPERTIES OUTPUT_NAME "${CUSTOM_NAME_EXEC}.elf")
-    set(HEX_FILE ${PROJECT_BINARY_DIR}/${CUSTOM_NAME_EXEC}.hex)
-    set(BIN_FILE ${PROJECT_BINARY_DIR}/${CUSTOM_NAME_EXEC}.bin)
+set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
+set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
 
-else ()
-    set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
-    set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
-
-endif ()
 
 # Generate hex and binary files
 if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.elf")
