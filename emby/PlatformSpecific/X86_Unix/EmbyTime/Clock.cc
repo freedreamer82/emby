@@ -1,4 +1,5 @@
 #include <EmbyTime/Clock.hh>
+#include <EmbyTime/Date.hh>
 #include "EmbyDebug/assert.hh"
 #include <ctime>
 #include <sys/time.h>
@@ -6,6 +7,21 @@
 namespace EmbyTime
 {
     static constexpr uint16_t BASE_YEAR_LINUX = 1900;
+
+    // Overload the subtraction operator for MonthOfYear
+    constexpr MonthOfYear operator-(MonthOfYear lhs, int rhs) {
+        using UnderlyingType = std::underlying_type_t<MonthOfYear>;
+        int result = static_cast<UnderlyingType>(lhs) - rhs;
+
+        // Wrap around to ensure the result is within the valid range (1 to 12)
+        if (result < 1) {
+            result = 12 + (result % 12);
+        } else if (result > 12) {
+            result = (result - 1) % 12 + 1;
+        }
+
+        return static_cast<MonthOfYear>(result);
+    }
 
     Clock::Clock() : m_impl()
     {
@@ -75,7 +91,7 @@ namespace EmbyTime
         return true;
     }
 
-    bool Clock::isRTCRunning() const
+    bool Clock::isRunning() const
     {
         // On Linux, assume system clock is always running
         return true;

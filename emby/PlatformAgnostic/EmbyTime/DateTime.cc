@@ -22,11 +22,11 @@ namespace EmbyTime
     DateTime::getTimeStamp(TimeStamp &ts, DateTime &dateTime)
     {
 
-        if (!dateTime.getDate().isValid())
+        if (!dateTime.getDate().isValid() || !dateTime.getTime().isValid())
         {
             return false;
         }
-        /* Number of days from begin of the non Leap-year*/
+
         /* Number of days from begin of the non Leap-year*/
         uint16_t
         constexpr monthDays[] = {0U, 0U, 31U, 59U, 90U, 120U, 151U, 181U, 212U, 243U, 273U, 304U, 334U};
@@ -152,9 +152,9 @@ namespace EmbyTime
 
     EmbyLibs::String DateTime::dateTimeToString(DateTime &dateTime)
     {
-        if (!dateTime.getDate().isValid())
+        if (!dateTime.getDate().isValid() || !dateTime.getTime().isValid())
         {
-            return "Invalid Date";
+            return "";
         }
         // Wed Jan 26 14:04:54 2022
         EmbyLibs::String out;

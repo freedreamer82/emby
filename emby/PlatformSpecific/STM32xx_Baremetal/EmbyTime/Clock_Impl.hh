@@ -1,9 +1,8 @@
 //
 // Created by marco on 18/01/22.
 //
-
-#if !defined(EMBYTIME_CLOCK_IMPL_HH)
-#define EMBYTIME_CLOCK_IMPL_HH
+#ifndef EMBY_CLOCK_IMPL_HH
+#define EMBY_CLOCK_IMPL_HH
 
 extern "C"
 {
@@ -18,7 +17,7 @@ namespace EmbyTime
     };
 }// namespace EmbyTime
 
-#endif // EMBYTIME_CLOCK_IMPL_HH
+#endif // EMBY_CLOCK_IMPL_HH
 
 
 

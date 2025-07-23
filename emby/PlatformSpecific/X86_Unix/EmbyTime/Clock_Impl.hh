@@ -1,5 +1,5 @@
-#if !defined(EMBYCLOCK_POSIX_IMPL_H)
-#define EMBYCLOCK_POSIX_IMPL_H
+#ifndef EMBY_CLOCK_IMPL_HH
+#define EMBY_CLOCK_IMPL_HH
 
 namespace EmbyTime
 {
@@ -10,4 +10,4 @@ namespace EmbyTime
 	};
 }
 
-#endif
+#endif // EMBY_CLOCK_IMPL_HH

@@ -60,11 +60,17 @@ namespace EmbyTime
 				return m_secs;
 			}
 
+            bool
+            isValid() const
+            {
+                return (m_hour < 24) && (m_min < 60) && (m_secs < 60);
+            }
+
 		private:
-			Hour  	         m_hour;
+			Hour  	 m_hour;
 			Min		 m_min;
 			Sec		 m_secs;
-			uint32_t         m_millis;
+			uint32_t m_millis;
 	};
 
 }

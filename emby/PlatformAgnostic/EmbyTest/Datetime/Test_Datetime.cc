@@ -109,7 +109,7 @@ int main()
     // TEST 6: Print output format
     //
     {
-        Date date((DayOfMonth)4, (MonthOfYear)7, 2025, (DayOfWeek)5); // Friday
+        Date date((DayOfMonth) 4, (MonthOfYear) 7, 2025, (DayOfWeek) 5); // Friday
         Time time(10, 15, 30);
         DateTime dt(date, time);
 
@@ -118,7 +118,20 @@ int main()
         assert(str == "4/7/2025 10:15:30");
     }
     //
-    // TEST 7: Invalid leap day (should not exist: 2019-02-29)
+    // TEST 7: Invalid time
+    //
+    {
+        Date badDate((DayOfMonth)15, (MonthOfYear)2, 2019);
+        Time t(24, 60, 0);
+        DateTime dt(badDate, t);
+
+        // This will pass in your implementation, even though it's not a valid date
+        // Suggestion: add validation if needed
+        bool ok = DateTime::getTimeStamp(ts, dt);
+        assert(ok == false); // Should not be valid
+    }
+    //
+    // TEST 8: Invalid leap day (should not exist: 2019-02-29)
     //
     {
         Date badDate((DayOfMonth)29, (MonthOfYear)2, 2019, (DayOfWeek)5);

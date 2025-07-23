@@ -96,7 +96,7 @@ namespace EmbyTime
         return true;
     }
 
-    bool Clock::isRTCRunning() const {
+    bool Clock::isRunning() const {
         return HAL_RTC_GetState((RTC_HandleTypeDef *) &m_impl.rtc) != HAL_RTC_STATE_RESET;
     }
 } // namespace EmbyTime
