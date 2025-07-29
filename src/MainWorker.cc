@@ -17,7 +17,7 @@ EmbyLog_MODULE_LOG_CLASS("main");
 using namespace EmbyLibs;
 using namespace EmbySystem;
 
-#define CONSOLE_UART "uart3"
+#define CONSOLE_UART "/dev/ttyMa"
 
 bool MainWorker::onErrors(EmbySystem::ErrorCode *err, EmbySystem::SystemError::Status status)
 {
@@ -69,29 +69,57 @@ static void processArm()
 }
 
 #elif EMBY_BUILD_X86
-static void processx86()
-{
-    static StdLogProcessor logger(EmbyLog::logMaskFrom(EmbyLog::LogLevel::Info));
-    EmbyLog::LogBus::get().registerProcessor(&logger);
-    
-    static EmbyConsole::ConsoleTelnet console = EmbyConsole::ConsoleTelnet(EmbyLog::logMaskFrom(EmbyLog::LogLevel::Debug), 3000, 2);
-    
-    static ConsoleCommandsProject::Context cc;
-    static ConsoleCommandsProject appCommands(cc);
-    console.setApplicationCommands(&appCommands);
-    //console.start();
-    log_info("Starting telnet localhost:3000");
-    
-    int errcode = 0;
-    while (true)
-    {
+//static void processx86()
+//{
+//    static StdLogProcessor logger(EmbyLog::logMaskFrom(EmbyLog::LogLevel::Info));
+//    EmbyLog::LogBus::get().registerProcessor(&logger);
+//
+//    static EmbyConsole::ConsoleTelnet console = EmbyConsole::ConsoleTelnet(EmbyLog::logMaskFrom(EmbyLog::LogLevel::Debug), 3000, 2);
+//
+//    static ConsoleCommandsProject::Context cc;
+//    static ConsoleCommandsProject appCommands(cc);
+//    console.setApplicationCommands(&appCommands);
+//    //console.start();
+//    log_info("Starting telnet localhost:3000");
+//
+//    int errcode = 0;
+//    while (true)
+//    {
 //        EmbySystem::delayMs(50);
 //        log_info("This is a log Test");
 //        EmbySystem::delayMs(5000);
 //        log_info("Fire Error Test");
 //        ErrorCode err{errcode++, upTimeMs(), "TestError"};
 //        SystemError::get().addError(err);
-        //console.doStep();
+//        //console.doStep();
+//        EmbySystem::delayMs(50);
+//    }
+//}
+static void processx86()
+{
+    EmbyMachine::Serial::Serial_Config uartConfig;
+    uartConfig.baudRate = EmbyMachine::Serial::Serial_BaudRate::Serial_BaudRate_115200;
+    uartConfig.flowCtrl = EmbyMachine::Serial::Serial_FlowCtrl::Serial_FlowCtrl_None;
+    uartConfig.mode = EmbyMachine::Serial::Serial_Mode::Serial_Mode_TxRx;
+    uartConfig.parity = EmbyMachine::Serial::Serial_Parity::Serial_Parity_None;
+    uartConfig.stopBits = EmbyMachine::Serial::Serial_StopBits::Serial_StopBits_1;
+    uartConfig.wordLen = EmbyMachine::Serial::Serial_WordLen::Serial_WordLen_8;
+    static ConsoleUart console = ConsoleUart(EmbyLog::logMaskFrom(EmbyLog::LogLevel::Debug), CONSOLE_UART, &uartConfig);
+
+    console.askLogin(true);
+    static ConsoleCommandsProject::Context cc;
+    static ConsoleCommandsProject appCommands(cc);
+    console.setApplicationCommands(&appCommands);
+
+//#ifdef EMBY_RTOS
+    ConsoleWorker::get().addConsole(&console);
+//#endif
+
+    while (true)
+    {
+//#ifdef EMBY_RTOS
+        console.doStep();
+//#endif
         EmbySystem::delayMs(50);
     }
 }

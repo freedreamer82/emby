@@ -10,7 +10,6 @@
 #include <EmbyThreading/Worker.hh>
 #include <EmbyLibs/StringUtils.hh>
 
-
 using namespace EmbyExec;
 using namespace EmbyLibs;
 
@@ -20,43 +19,75 @@ static std::vector<EmbyMachine::Serial *> g_serials;
 
 extern "C"
 {
+#include "Uart_Config.h"
+#include <fcntl.h>
+#include "pthread.h"
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/sysmacros.h>
+#include <unistd.h>
+#include <errno.h>
+#include <pty.h>
+#include <string.h>
 }
 
 
 namespace EmbyMachine
 {
+
+//    int create_pty_pair(int *master_fd, int *slave_fd, char *slave_name, size_t name_len) {
+//        if (master_fd == NULL || slave_fd == NULL || slave_name == NULL) {
+//            EmbyDebug_ASSERT_FAIL();
+//        }
+//
+//        memset(slave_name, 0, name_len);
+//
+//        if (openpty(master_fd, slave_fd, slave_name, NULL, NULL) == -1) {
+//            EmbyDebug_ASSERT_FAIL();
+//        }
+//
+//        return 0;
+//    }
+
+    int create_pty_device(const char* device_name) {
+        int master_fd, slave_fd;
+        char *slave_name;
+        // Apri il master PTY
+        master_fd = posix_openpt(O_RDWR | O_NOCTTY);
+        if (master_fd < 0) return -1;
+        // Sblocca e imposta il slave
+        grantpt(master_fd);
+        unlockpt(master_fd);
+        // Ottieni il nome del slave
+        slave_name = ptsname(master_fd);
+        // Crea un link simbolico con il nome desiderato
+        symlink(slave_name, device_name);
+        return master_fd; // Il server userà questo fd
+    }
+
+    void ensureDeviceExists(const char* devicePath)
+    {
+        struct stat buffer;
+        if (stat(devicePath, &buffer) != 0) {
+            // Device does not exist, create it
+            int majorNumber = MAJOR_NUMBER; // Replace with the correct major number
+            int minorNumber = MINOR_NUMBER;   // Replace with the correct minor number
+            dev_t dev = makedev(majorNumber, minorNumber);
+            if (mknod(devicePath, S_IFCHR | 0666, dev) != 0) {
+                EmbyDebug_ASSERT_FAIL();
+            }
+        }
+    }
+
+
     Serial::Serial(EmbyLibs::String const &dev, Serial_Config *conf, bool doOpen) :
             m_dev(dev), m_eol(DEFAULT_EOL_CHAR), m_isOpen(false)
     {
-		if(m_dev == "uart1")
-		{
-			m_impl.dev = Uart_Config_Uart_Num_1_dev;
-		}
-		else if(m_dev == "uart2")
-		{
-            m_impl.dev = Uart_Config_Uart_Num_2_dev;
-		}
-		else if(m_dev == "uart3")
-		{
-            m_impl.dev = Uart_Config_Uart_Num_3_dev;
-		}
-        else if(m_dev == "uart4")
-        {
-            m_impl.dev = Uart_Config_Uart_Num_4_dev;
-        }
-        else if(m_dev == "uart5")
-        {
-            m_impl.dev = Uart_Config_Uart_Num_5_dev;
-        }
-		else
-		{
-			EmbyDebug_ASSERT_FAIL();
-		}
+        m_impl.dev = (const_cast<char *>(m_dev.c_str()));
 
         struct termios config;
-        if (tcgetattr(fd, &config) != 0) {
+        if (tcgetattr(m_impl.fd, &config) != 0) {
             perror("tcgetattr");
-            return false;
         }
         config.c_cflag &= ~CSIZE;
         switch (conf->wordLen)
@@ -166,7 +197,7 @@ namespace EmbyMachine
         }
 
         // Uart_ctorNopen(&m_impl.m_uart, Uart_Num_1, &m_impl.m_cfg, 0, 0);
-
+        m_isOpen = false;
         m_impl.m_mutex = EmbyThreading::Mutex();
         m_impl.m_discarded = 0;
         m_impl.m_buff = EmbyLibs::CircularBuffer<uint8_t, APP_CIRC_BUFF_SIZE>();  //app buffer
@@ -181,40 +212,50 @@ namespace EmbyMachine
     bool Serial::open()
     {
         EmbyThreading::ScopedMutex(m_impl.m_mutex);
-
+        if (m_isOpen)
+        {
+            return true;
+        }
         g_serials.push_back((this));
 
-        bool   retval = false;
-        struct termios config;
-        m_impl.fd = open(m_impl.dev, O_RDWR | O_NONBLOCK);
-        if (m_impl.fd >= 0)
+        struct stat buffer_stat;
+        struct stat buffer_lstat;
+
+        if (stat(m_impl.dev, &buffer_stat) != 0)
         {
-            /*Save Old configuration*/
-            if (  tcgetattr(m_impl.fd, &config)             ||
-                  tcsetattr(m_impl.fd,TCSANOW,&config)      ||
-                  tcsetattr(m_impl.fd,TCSAFLUSH,&config)    ||
-                  fcntl(m_impl.fd ,F_SETFL, FNDELAY)        || /*read non blocking*/
-                  fcntl(m_impl.fd, F_SETFL, O_NONBLOCK) )       /*NON blocking file...*/
+
+            m_impl.fd = create_pty_device(m_impl.dev);
+        }
+        else
+        {
+            if (lstat(m_impl.dev, &buffer_lstat) == 0 && S_ISLNK(buffer_stat.st_mode))
             {
-                close(m_impl.fd);
-                retval = false;
+                if (unlink(m_impl.dev) != 0)
+                {
+                    EmbyDebug_ASSERT_FAIL();
+                }
+                m_impl.fd = create_pty_device(m_impl.dev);
             }
-            else
-            {
-                retval = pthread_create(&m_impl.pThread ,  NULL, Uart_taskRun , self)== 0;
-                /*retval = true;*/
-                m_impl.devIsOpen = true;
+            else{
+                m_impl.fd = ::open(m_impl.dev, O_RDWR | O_NOCTTY | O_NONBLOCK);
             }
         }
-        m_isOpen = true;
-        return retval;
-        //return true;
+
+        if (m_impl.fd < 0)
+        {
+            fprintf(stderr, "Error opening serial port %s: %s\n", m_impl.dev, strerror(errno));
+            EmbyDebug_ASSERT_FAIL();
+        }
+        if (m_impl.fd >= 0){
+            m_isOpen = true;
+        }
+        return m_isOpen;
     }
 
     bool Serial::close()
     {
         EmbyThreading::ScopedMutex(m_impl.m_mutex);
-        int retval = close(m_impl.fd);
+        int retval = ::close(m_impl.fd);
         m_isOpen = false;
         return retval == 0;
     }
@@ -229,89 +270,9 @@ namespace EmbyMachine
     Serial::write(void const *buffer, size_t length)
     {
         EmbyThreading::ScopedMutex(m_impl.m_mutex);
-        Debug_ASSERT(buffer != NULL);
-        return write(m_impl.fd,(uint8_t*)buffer,length);
+        EmbyDebug_ASSERT(buffer != NULL);
+        return ::write(m_impl.fd,(uint8_t*)buffer,length);
     }
-
-
-	static int checkLineInTheBuffer(EmbyMachine::Serial* s )
-	{
-		size_t len = 0;
-
-		volatile uint32_t i = 0;
-
-		if( ! s->getImpl()->m_buff.isEmpty() )
-		{
-	//		for(auto it =  s->getImpl()->m_buff.begin() ;
-	//			it != s->getImpl()->m_buff.end(); it++)
-			for(auto c :  s->getImpl()->m_buff )
-			{
-				i++;
-				EmbyDebug_ASSERT(i <= s->getImpl()->m_buff.getCapacity());
-				//volatile auto c = *it;
-				if( c == s->getEndofLineChar() )
-				{
-					len = i;
-					break;
-				}
-			}
-		}
-		return len;
-	}
-
-	static bool readLineInsideBuffer(EmbyLibs::String& line , EmbyMachine::Serial* s)
-	{
-		EmbyDebug_ASSERT_CHECK_NULL_PTR( s );
-		bool retval = false;
-		//readline
-	//	line.clear();
-		int toPop = 0;
-		bool dothrow = false;
-
-		EmbySystem_BEGIN_CRITICAL_SECTION;
-		if( ! s->getImpl()->m_buff.isEmpty())
-		{
-			EmbyDebug_ASSERT_CHECK_NULL_PTR(&s->getImpl()->m_buff);
-
-			for(auto c :  s->getImpl()->m_buff )
-			{
-				toPop++;
-				if( c != s->getEndofLineChar() )
-				{
-					try
-					{
-						//could throw excep
-						line.push_back(c);
-					}
-					catch (...)
-					{
-						dothrow = true;
-					}
-				}
-				else
-				{
-					retval = true;
-					break;
-				}
-			}
-
-			for(int z= 0 ; z < toPop ; z++)
-			{
-				if(!s->getImpl()->m_buff.isEmpty())
-				{
-					s->getImpl()->m_buff.pop();
-				}
-			}
-		}
-		EmbySystem_END_CRITICAL_SECTION;
-
-		if(dothrow)
-		{
-			throw std::bad_alloc();
-		}
-
-		return retval;
-	}
 
     EmbyLibs::String Serial::readline(int32_t timeoutMs)
     {
@@ -319,45 +280,37 @@ namespace EmbyMachine
 
         volatile bool exit = false;
         volatile size_t len = 0;
-        EmbyLibs::String line;
+        String line;
         line.clear();
 
         uint64_t start = EmbySystem::upTimeMs();
 
         do
         {
-            EmbySystem_BEGIN_CRITICAL_SECTION;
-            {
-                len = checkLineInTheBuffer(this);
-            }
-            EmbySystem_END_CRITICAL_SECTION;
+            len = checkLineInTheBuffer(this);
 
-            if (len != 0)
+            if (len >= 0)
             {
-                line.reserve(len);
-                if (line.data())
+
+                auto err = line.reserve(len);
+                if (err < 0)
                 {
-                    //is valid the string
-                    exit = readLineInsideBuffer(line, this);
+                    line.clear();
+                    return line;
                 }
-                if (noEmptyString)
-                {
-                    EmbyLibs::trim(line);
-                    exit = !line.empty();
-                }
+                exit = readLineInsideBuffer(line, this);
             }
             else
             {
-                //EmbyThreading::Thread::yield();
-                EmbySystem::delayMs(3);
+                EmbySystem::delayMs(5);
             }
 
             if (timeoutMs > 0)
             {
                 if ((EmbySystem::upTimeMs() - start) > timeoutMs)
                 {
-//					 throw EmbyLibs::Timeout("Serial");
-                    exit = true;
+                    line.clear();
+                    return line;
                 }
             }
 
@@ -369,39 +322,13 @@ namespace EmbyMachine
     size_t Serial::read(void *buffer, size_t length)
     {
         EmbyThreading::ScopedMutex(m_impl.m_mutex);
-
-        size_t retval = 0;
-        uint8_t *data = (uint8_t *) buffer;
-
-        if (buffer)
-        {
-            size_t i = 0;
-            while (!m_impl.m_buff.isEmpty() && i < length)
-            {
-                {
-                    uint8_t byte ;
-                    if (m_impl.m_buff.front(byte))
-                    {
-                        data[i] = byte;
-                    }
-                    if (!m_impl.m_buff.isEmpty())
-                    {
-                        m_impl.m_buff.pop();
-                    }
-                }
-                ++i;
-            }
-
-            retval = i;
-        }
-        return retval;
+        int size = ::read(m_impl.fd, (uint8_t*)buffer,length);
+        return size >= 0 ? size : 0;
     }
 
     void Serial::enableRx()
     {
         EmbyThreading::ScopedMutex(m_impl.m_mutex);
-
-
     }
 
 
