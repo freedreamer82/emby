@@ -17,7 +17,7 @@ EmbyLog_MODULE_LOG_CLASS("main");
 using namespace EmbyLibs;
 using namespace EmbySystem;
 
-#define CONSOLE_UART "/dev/ttyMa"
+#define CONSOLE_UART "/dev/ttyTest"
 
 bool MainWorker::onErrors(EmbySystem::ErrorCode *err, EmbySystem::SystemError::Status status)
 {

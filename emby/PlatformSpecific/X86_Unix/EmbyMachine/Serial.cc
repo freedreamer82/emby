@@ -274,6 +274,86 @@ namespace EmbyMachine
         return ::write(m_impl.fd,(uint8_t*)buffer,length);
     }
 
+
+	static int checkLineInTheBuffer(EmbyMachine::Serial* s )
+	{
+		size_t len = 0;
+
+		volatile uint32_t i = 0;
+
+		if( ! s->getImpl()->m_buff.isEmpty() )
+		{
+	//		for(auto it =  s->getImpl()->m_buff.begin() ;
+	//			it != s->getImpl()->m_buff.end(); it++)
+			for(auto c :  s->getImpl()->m_buff )
+			{
+				i++;
+				EmbyDebug_ASSERT(i <= s->getImpl()->m_buff.getCapacity());
+				//volatile auto c = *it;
+				if( c == s->getEndofLineChar() )
+				{
+					len = i;
+					break;
+				}
+			}
+		}
+		return len;
+	}
+
+	static bool readLineInsideBuffer(EmbyLibs::String& line , EmbyMachine::Serial* s)
+	{
+		EmbyDebug_ASSERT_CHECK_NULL_PTR( s );
+		bool retval = false;
+		//readline
+	//	line.clear();
+		int toPop = 0;
+		bool dothrow = false;
+
+		EmbySystem_BEGIN_CRITICAL_SECTION;
+		if( ! s->getImpl()->m_buff.isEmpty())
+		{
+			EmbyDebug_ASSERT_CHECK_NULL_PTR(&s->getImpl()->m_buff);
+
+			for(auto c :  s->getImpl()->m_buff )
+			{
+				toPop++;
+				if( c != s->getEndofLineChar() )
+				{
+					try
+					{
+						//could throw excep
+						line.push_back(c);
+					}
+					catch (...)
+					{
+						dothrow = true;
+					}
+				}
+				else
+				{
+					retval = true;
+					break;
+				}
+			}
+
+			for(int z= 0 ; z < toPop ; z++)
+			{
+				if(!s->getImpl()->m_buff.isEmpty())
+				{
+					s->getImpl()->m_buff.pop();
+				}
+			}
+		}
+		EmbySystem_END_CRITICAL_SECTION;
+
+		if(dothrow)
+		{
+			throw std::bad_alloc();
+		}
+
+		return retval;
+	}
+
     EmbyLibs::String Serial::readline(int32_t timeoutMs)
     {
         EmbyThreading::ScopedMutex(m_impl.m_mutex);
