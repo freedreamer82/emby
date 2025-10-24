@@ -23,7 +23,7 @@
 
 #include <EmbySystem/System.hh>
 #include <EmbySystem/SystemError.hh>
-//#include <EmbySystem/Timer.hh>
+#include <EmbySystem/Timer.hh>
 
 
 #include <EmbyTime/DateTime.hh>

@@ -7,7 +7,7 @@
 #include <EmbyLog/Log.hh>
 
 #ifdef EMBY_BUILD_X86
-#include "ConsoleTelnet.hh"
+#include <EmbyConsole/ConsoleTelnet.hh>
 #include <EmbyLog/StdLogProcessor.hh>
 #include <cstdio>
 #endif

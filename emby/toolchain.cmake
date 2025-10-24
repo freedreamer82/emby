@@ -28,7 +28,7 @@ if( DEFINED ENV{EMBY_CROSS_BUILD_ARCH})
         message(FATAL_ERROR " only ARM and X86 are valid!")
     endif()
 else()
-    message(FATAL_ERROR "EMBY_CROSS_BUILD_ARCH is not set!!")
+#    message(FATAL_ERROR "EMBY_CROSS_BUILD_ARCH is not set!!")
 endif()
 
 

@@ -14,11 +14,8 @@ else()
 endif()
 
 # Include Emby framework
-if(EMBY_FOLDER)
-    message(STATUS "including EMBY cmake: ${EMBY_FOLDER}/emby.cmake")
-    set(ENV{EMBY_FOLDER} ["${EMBY_FOLDER}"])
-    include("${EMBY_FOLDER}/emby.cmake")
-endif()
+
+include("emby/emby-core.cmake")
 
 # Compiler options
 add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0)
@@ -29,13 +26,17 @@ include_directories(src/* src/*/*/)
 
 if("${EMBY_PLATFORM}" STREQUAL "X86_Unix")
     message(STATUS "Including APP x86 PLATFORM")
+    include("emby/platform/X86_Unix/emby-platform.cmake")
     include("src/platform/x86/app-platform.cmake")
+
 elseif("${EMBY_PLATFORM}" STREQUAL "STM32xx_Baremetal")
     if("${STM32xx_Baremetal_FAMILY}" STREQUAL "STM32H5xx")
         message(STATUS "Including APP H5 PLATFORM")
+        include("emby/platform/STM32xx_Baremetal/emby-platform.cmake")
         include("src/platform/arm/ST/nucleo_stm32H563ZI/app-platform.cmake")
     elseif ("${STM32xx_Baremetal_FAMILY}" STREQUAL "STM32H7xx")
         message(STATUS "Including APP H7 PLATFORM")
+        include("emby/platform/STM32xx_Baremetal/emby-platform.cmake")
         include("src/platform/arm/ST/nucleo_stm32H743ZI/app-platform.cmake")
     endif()
 endif()
@@ -76,7 +77,7 @@ endif()
 
 
 if (${EMBY_PLATFORM} STREQUAL "STM32xx_Baremetal")
-    set(CUSTOM_NAME_EXEC "embt-test_${EMBY_PLATFORM}_${STM32xx_Baremetal_DEVICE}")
+    set(CUSTOM_NAME_EXEC "emby-test_${EMBY_PLATFORM}_${STM32xx_Baremetal_DEVICE}")
 endif ()
 
 if (CUSTOM_NAME_EXEC)
