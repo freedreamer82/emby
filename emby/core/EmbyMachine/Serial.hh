@@ -20,7 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 
-#include <EmbyMachine/SerialImpl.hh>
+#include "SerialImpl.hh"
 #include <EmbyExec/ListenersHandler.hh>
 #include <EmbyLibs/String.hh>
 

@@ -17,7 +17,6 @@ EmbyLog_MODULE_LOG_CLASS("main");
 using namespace EmbyLibs;
 using namespace EmbySystem;
 
-#define CONSOLE_UART "uart3"
 
 bool MainWorker::onErrors(EmbySystem::ErrorCode *err, EmbySystem::SystemError::Status status)
 {
@@ -39,6 +38,8 @@ MainWorker::~MainWorker()
 }
 
 #ifdef EMBY_BUILD_ARM
+#define CONSOLE_UART "uart3"
+
 static void processArm()
 {
     EmbyMachine::Serial::Serial_Config uartConfig;
@@ -69,6 +70,46 @@ static void processArm()
 }
 
 #elif EMBY_BUILD_X86
+
+int static testSerials()
+{
+    // Configurazione seriale
+    EmbyMachine::Serial::Serial_Config config;
+    config.baudRate = EmbyMachine::Serial::Serial_BaudRate::Serial_BaudRate_115200;
+    config.flowCtrl = EmbyMachine::Serial::Serial_FlowCtrl::Serial_FlowCtrl_None;
+    config.mode = EmbyMachine::Serial::Serial_Mode::Serial_Mode_TxRx;
+    config.parity = EmbyMachine::Serial::Serial_Parity::Serial_Parity_None;
+    config.stopBits = EmbyMachine::Serial::Serial_StopBits::Serial_StopBits_1;
+    config.wordLen = EmbyMachine::Serial::Serial_WordLen::Serial_WordLen_8;
+
+    // Usa una sola seriale di test (loopback locale)
+    EmbyMachine::Serial serial("/dev/ttyTest1", &config, true);
+
+    // Flush iniziale
+    serial.flush();
+
+    // Test: scrivi e poi leggi sulla stessa porta
+    EmbyLibs::String testMsg = EmbyLibs::String("HelloSerial");
+    serial.write(testMsg);
+    log_info("Messaggio inviato su serial: %S", testMsg);
+
+    EmbySystem::delayMs(100); // Attendi propagazione
+    EmbyLibs::String received = serial.readline(5000); // Timeout 2s
+    log_info("Messaggio ricevuto su serial: %S", received);
+
+    // Verifica
+    if (received == "HelloSerial") {
+        log_info("TEST OK: readline funziona!");
+        return 0;
+    } else {
+        log_info("TEST FAIL: messaggio non corrisponde!->%S !!!",received);
+        return 1;
+    }
+}
+
+
+#define CONSOLE_UART "/dev/ttyTest"
+
 static void processx86()
 {
     static StdLogProcessor logger(EmbyLog::logMaskFrom(EmbyLog::LogLevel::Info));
@@ -81,18 +122,25 @@ static void processx86()
     console.setApplicationCommands(&appCommands);
     //console.start();
     log_info("Starting telnet localhost:3000");
-    
+
+
+    EmbyMachine::Serial::Serial_Config uartConfig;
+    uartConfig.baudRate = EmbyMachine::Serial::Serial_BaudRate::Serial_BaudRate_115200;
+    uartConfig.flowCtrl = EmbyMachine::Serial::Serial_FlowCtrl::Serial_FlowCtrl_None;
+    uartConfig.mode = EmbyMachine::Serial::Serial_Mode::Serial_Mode_TxRx;
+    uartConfig.parity = EmbyMachine::Serial::Serial_Parity::Serial_Parity_None;
+    uartConfig.stopBits = EmbyMachine::Serial::Serial_StopBits::Serial_StopBits_1;
+    uartConfig.wordLen = EmbyMachine::Serial::Serial_WordLen::Serial_WordLen_8;
+    static ConsoleUart consoleserial = ConsoleUart(EmbyLog::logMaskFrom(EmbyLog::LogLevel::Debug), CONSOLE_UART, &uartConfig);
+
+    ConsoleWorker::get().addConsole(&consoleserial);
+    log_info("Starting serial console on %s", CONSOLE_UART);
+
+    testSerials();
     int errcode = 0;
     while (true)
     {
-//        EmbySystem::delayMs(50);
-//        log_info("This is a log Test");
-//        EmbySystem::delayMs(5000);
-//        log_info("Fire Error Test");
-//        ErrorCode err{errcode++, upTimeMs(), "TestError"};
-//        SystemError::get().addError(err);
-        //console.doStep();
-        EmbySystem::delayMs(50);
+        EmbySystem::delayMs(10);
     }
 }
 #endif
