@@ -78,12 +78,15 @@ endforeach()
 
 message(STATUS "include cmake from: ${EMBY_PLATFORM}")
 
+#add extra platform sources
 file(GLOB_RECURSE EMBY_PLAT_SOURCES
-    "${EMBY_STM32_BAREMETAL_PLATFORM}/Emby*/*.cc"
-    "${EMBY_STM32_BAREMETAL_PLATFORM}/Startup/*/*.c"
+      "${EMBY_STM32_BAREMETAL_PLATFORM}/Startup/*/*.c"
     "${EMBY_STM32_BAREMETAL_PLATFORM}/Drivers/CMSIS/*/*/${${EMBY_PLATFORM}_FAMILY}/*/*.c"
     "${EMBY_STM32_BAREMETAL_PLATFORM}/Drivers/hal_conf/${${EMBY_PLATFORM}_FAMILY}_HAL_Driver/*/*.c"
 )
+
+#add common Emby platform sources
+EMBY_ADD_SOURCES(${EMBY_STM32_BAREMETAL_PLATFORM}  EMBY_PLAT_SOURCES )
 
 list(APPEND EMBY_SOURCES ${EMBY_PLAT_SOURCES})
 
@@ -95,3 +98,9 @@ set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} -x assembler-with-cpp")
 
 
 list(APPEND SOURCES ${EMBY_SOURCES})
+
+
+
+#foreach(src IN LISTS SOURCES)
+#    message(STATUS "${src}")
+#endforeach()

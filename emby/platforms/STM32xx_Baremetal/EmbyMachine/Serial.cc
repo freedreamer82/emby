@@ -1,6 +1,4 @@
 #include <EmbyMachine/Serial.hh>
-#include <EmbyMachine/SerialImpl.hh>
-
 
 #include <EmbyLibs/CircularBuffer.hh>
 
@@ -15,7 +13,7 @@
 
 EmbyLog_MODULE_LOG_CLASS("s");
 
-using namespace EmbyExec;
+
 using namespace EmbyLibs;
 
 #define CR1_SBK_Set               ((uint16_t)0x0001)  /*!< USART Break Character send Mask */

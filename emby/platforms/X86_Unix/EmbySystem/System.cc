@@ -43,9 +43,19 @@ namespace EmbySystem
 		return false;
 	}
 
+    void EnterCriticalSection()
+    {
+//        EmbyDebug_ASSERT_FAIL();
+    }
+
+     void ExitCriticalSection()
+    {
+//        EmbyDebug_ASSERT_FAIL();
+    }
 
 
-	void
+
+    bool
 	startScheduler(void)
 	{
 		g_isRunning = true;
@@ -55,7 +65,7 @@ namespace EmbySystem
 		}
 	}
 
-	void
+    bool
 	stopScheduler(void)
 	{
 		g_isRunning = false;

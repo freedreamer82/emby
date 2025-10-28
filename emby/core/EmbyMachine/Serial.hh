@@ -21,7 +21,6 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include "SerialImpl.hh"
-#include <EmbyExec/ListenersHandler.hh>
 #include <EmbyLibs/String.hh>
 
 /* Exported types ------------------------------------------------------------*/
@@ -122,9 +121,8 @@ namespace EmbyMachine
             Serial_FlowCtrl flowCtrl;
             Serial_BaudRate baudRate;
             Serial_Mode mode;
-            uint16_t buffSize;  //not all machine can provide this
         }
-                Serial_Config;
+        Serial_Config;
 
         enum class Serial_Pin_Status : uint8_t
         {

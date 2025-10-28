@@ -3,7 +3,7 @@
 
 namespace EmbyThreading
 {
-sasas
+
     struct MutexImpl
     {
 

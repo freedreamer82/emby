@@ -10,7 +10,7 @@ set(EMBY_PLATFORM X86_Unix)
 if (EMBY_FOLDER)
     message(STATUS "including EMBY cmake:" ${EMBY_FOLDER}/emby.cmake)
     set(ENV{EMBY_FOLDER} ["${EMBY_FOLDER}"])
-    include("${EMBY_FOLDER}/emby.cmake")
+    include("${EMBY_FOLDER}/emby-core.cmake")
 endif()
 
 

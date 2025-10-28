@@ -7,8 +7,6 @@
 
 namespace EmbySystem
 {
-    #define EmbySystem_BEGIN_CRITICAL_SECTION
-    #define EmbySystem_END_CRITICAL_SECTION
 
     struct SystemUniqueId
     {

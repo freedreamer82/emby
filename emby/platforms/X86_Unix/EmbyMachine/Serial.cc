@@ -1,7 +1,4 @@
 #include <EmbyMachine/Serial.hh>
-
-#include <EmbyLibs/CircularBuffer.hh>
-
 #include <EmbyDebug/assert.hh>
 #include <EmbyThreading/Thread.hh>
 #include <EmbyThreading/ScopedMutex.hh>
@@ -9,7 +6,6 @@
 #include <EmbyLibs/StringUtils.hh>
 #include <EmbyLog/Log.hh>
 
-using namespace EmbyExec;
 using namespace EmbyLibs;
 
 

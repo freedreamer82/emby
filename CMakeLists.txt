@@ -26,17 +26,17 @@ include_directories(src/* src/*/*/)
 
 if("${EMBY_PLATFORM}" STREQUAL "X86_Unix")
     message(STATUS "Including APP x86 PLATFORM")
-    include("emby/platform/X86_Unix/emby-platform.cmake")
+    include("emby/platforms/X86_Unix/emby-platform.cmake")
     include("src/platform/x86/app-platform.cmake")
 
 elseif("${EMBY_PLATFORM}" STREQUAL "STM32xx_Baremetal")
     if("${STM32xx_Baremetal_FAMILY}" STREQUAL "STM32H5xx")
         message(STATUS "Including APP H5 PLATFORM")
-        include("emby/platform/STM32xx_Baremetal/emby-platform.cmake")
+        include("emby/platforms/STM32xx_Baremetal/emby-platform.cmake")
         include("src/platform/arm/ST/nucleo_stm32H563ZI/app-platform.cmake")
     elseif ("${STM32xx_Baremetal_FAMILY}" STREQUAL "STM32H7xx")
         message(STATUS "Including APP H7 PLATFORM")
-        include("emby/platform/STM32xx_Baremetal/emby-platform.cmake")
+        include("emby/platforms/STM32xx_Baremetal/emby-platform.cmake")
         include("src/platform/arm/ST/nucleo_stm32H743ZI/app-platform.cmake")
     endif()
 endif()
@@ -48,7 +48,11 @@ file(GLOB_RECURSE APP_SOURCES
     "src/MainWorker.cc"
 )
 
-list(APPEND SOURCES ${APP_SOURCES} ${EMBY_SOURCES})
+# Non aggiungere più EMBY_SOURCES direttamente a SOURCES: useremo librerie
+list(APPEND SOURCES ${APP_SOURCES})
+
+# NOTE: emby_core and emby_platform library targets are created in their respective
+# cmake files (emby-core.cmake creates emby_core; platform cmake creates emby_platform)
 
 # Project settings
 project(emby-test_${EMBY_PLATFORM} CXX C ASM)
@@ -73,6 +77,14 @@ else()
         add_compile_options(-Werror=format)
     endif()
     add_executable(${PROJECT_NAME} ${SOURCES})
+endif()
+
+# Link main executable with emby libraries if they exist
+if(TARGET emby_core)
+    target_link_libraries(${PROJECT_NAME} PRIVATE emby_core)
+endif()
+if(TARGET emby_platform)
+    target_link_libraries(${PROJECT_NAME} PRIVATE emby_platform)
 endif()
 
 

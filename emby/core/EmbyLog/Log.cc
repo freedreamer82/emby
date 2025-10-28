@@ -32,16 +32,11 @@ namespace EmbyLog
 
     void logPrintf(LogLevel level, LogClass logClass, char const *fmt, ...)
     {
-        //  try
         {
             va_list args;
             va_start(args, fmt);
             logVPrintf(level, logClass, fmt, args);
             va_end(args);
-        }
-        //	catch (std::bad_alloc const&)
-        {
-            // do nothing...log lost!
         }
     }
 

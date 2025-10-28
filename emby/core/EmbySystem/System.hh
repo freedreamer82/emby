@@ -15,8 +15,7 @@
 #include <EmbyTime/Millis.hh>
 #include <EmbyDebug/assert.hh>
 #include <limits>
-//#include "EmbySystem_Impl.hh"
-#include <EmbySystem/EmbySystem_Impl.hh>
+#include "System_Impl.hh"
 
 /**
  *
@@ -28,15 +27,10 @@
 namespace EmbySystem
 {
 
-    __attribute__((weak)) void EnterCriticalSection()
-    {
-        // do things
-    }
+    void EnterCriticalSection();
 
-    __attribute__((weak)) void ExitCriticalSection()
-    {
-        // do things
-    }
+    void ExitCriticalSection();
+
 
     /**
      * Terminates the program execution. If the program is executed in the
@@ -64,7 +58,7 @@ namespace EmbySystem
     /**
     * start the OS Scheduler
     */
-    void
+    bool
     startScheduler();
 
     /**
@@ -74,10 +68,11 @@ namespace EmbySystem
     isInInterrupt();
 
     bool areInterruptsEnabled();
+
     /**
     * stop the OS Scheduler
     */
-    void
+    bool
     stopScheduler();
 
 
@@ -114,7 +109,7 @@ namespace EmbySystem
 
         ~CriticalSection()
         {
-            EnterCriticalSection();
+            ExitCriticalSection();
         };
     private:
 
@@ -139,5 +134,3 @@ namespace EmbySystem
 
 #endif
 ///@}
-
-

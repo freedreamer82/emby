@@ -17,7 +17,7 @@
 
 #include <EmbyLibs/Singleton.hh>
 
-#include <EmbyTime/Clock_Impl.hh>
+#include "Clock_Impl.hh"
 #include <EmbyTime/DateTime.hh>
 #include <EmbyTime/Date.hh>
 #include <EmbyTime/Time.hh>
