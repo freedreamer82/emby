@@ -63,12 +63,14 @@ namespace EmbySystem
 		{
 			sleep(2);
 		}
+        return true;
 	}
 
     bool
 	stopScheduler(void)
 	{
 		g_isRunning = false;
+        return true;
 	}
 
 	void

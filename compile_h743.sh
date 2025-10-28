@@ -1,25 +1,30 @@
-# Clean and build for STM32H5 development
+# Clean and build for STM32H7 development
 ./cleanall.sh
 
-# Create build directory if it doesn't exist
-mkdir -p build
-cd build
+# Resolve repository root (script location) to allow running this script from anywhere
+REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
+PLATFORM="STM32xx_Baremetal"
+FAMILY="STM32H7xx"
+DEVICE="STM32H743xx"
+BUILD_DIR="${REPO_ROOT}/build/${PLATFORM}/${FAMILY}"
 
-cmake \
-    -DEMBY_FOLDER=$PWD/../emby \
-    -DEMBY_CONFIG=../src/emby_config.h \
-    -DSTM32xx_Baremetal_DEVICE=STM32H743xx \
-    -DSTM32xx_Baremetal_FAMILY=STM32H7xx \
-    -DEMBY_PLATFORM=STM32xx_Baremetal \
-    -DSTM32xx_Baremetal_STARTUP=${PWD}/../src/platform/arm/ST/nucleo_stm32H743ZI/startup_stm32h743zitx.s \
-    -DSTM32xx_Baremetal_CONF_DIR=${PWD}/../src/platform/arm/ST/nucleo_stm32H743ZI/ \
-    -DSTM32xx_Baremetal_LINKER=${PWD}/../src/platform/arm/ST/nucleo_stm32H743ZI/STM32H743ZITX_FLASH.ld \
-    ..
+# Create build directory if it doesn't exist
+mkdir -p "${BUILD_DIR}"
+
+cmake -S "${REPO_ROOT}" -B "${BUILD_DIR}" \
+    -DEMBY_FOLDER=${REPO_ROOT}/emby \
+    -DEMBY_CONFIG=${REPO_ROOT}/src/emby_config.h \
+    -DSTM32xx_Baremetal_DEVICE=${DEVICE} \
+    -DSTM32xx_Baremetal_FAMILY=${FAMILY} \
+    -DEMBY_PLATFORM=${PLATFORM} \
+    -DSTM32xx_Baremetal_STARTUP=${REPO_ROOT}/src/platform/arm/ST/nucleo_stm32H743ZI/startup_stm32h743zitx.s \
+    -DSTM32xx_Baremetal_CONF_DIR=${REPO_ROOT}/src/platform/arm/ST/nucleo_stm32H743ZI/ \
+    -DSTM32xx_Baremetal_LINKER=${REPO_ROOT}/src/platform/arm/ST/nucleo_stm32H743ZI/STM32H743ZITX_FLASH.ld
 
 # Check if cmake was successful
 if [ $? -eq 0 ]; then
-    echo "✅ CMake configuration completed successfully!"
-    echo "You can now proceed with: cd build && make"
+    echo "✅ CMake configuration completed successfully in ${BUILD_DIR}!"
+    echo "You can now proceed with: cd ${BUILD_DIR} && make"
 else
     echo "❌ CMake configuration failed!"
     exit 1
