@@ -25,7 +25,7 @@ namespace EmbyThreading
 
         Thread(EmbyThreading::Worker *worker,
                char const *name,
-               size_t stackSize,
+               uint32_t stackSize,
                Priority priority, bool start = true,
                uint32_t *stack = nullptr);
 

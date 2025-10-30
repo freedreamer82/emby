@@ -7,7 +7,6 @@
 
 namespace EmbySystem
 {
-
     struct SystemUniqueId
     {
         uint32_t m_id[4];

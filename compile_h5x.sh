@@ -3,7 +3,28 @@
 
 # Resolve repository root (script location)
 REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
-PLATFORM="STM32xx_Baremetal"
+
+# Verifica argomento obbligatorio: baremetal o freertos
+if [ -z "$1" ]; then
+    echo "Usage: $0 <baremetal|freertos>"
+    exit 1
+fi
+
+case "$1" in
+    baremetal)
+        PLATFORM="STM32xx_Baremetal"
+        ;;
+    freertos)
+        # Per FreeRTOS usiamo la piattaforma STM32H5xx_FreeRTOS
+        PLATFORM="STM32xx_FreeRTOS"
+        ;;
+    *)
+        echo "Invalid platform type: $1"
+        echo "Usage: $0 <baremetal|freertos>"
+        exit 1
+        ;;
+esac
+
 FAMILY="STM32H5xx"
 DEVICE="STM32H563xx"
 BUILD_DIR="${REPO_ROOT}/build/${PLATFORM}/${FAMILY}"

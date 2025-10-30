@@ -73,10 +73,10 @@ include("${EMBY_FOLDER}/toolchain.cmake")
 
 # Required checks
 if (${EMBY_PLATFORM}_DEVICE)
-    add_definitions(-DUSE_HAL_DRIVER -D${${EMBY_PLATFORM}_DEVICE})
-else()
-    message(FATAL_ERROR "include device i.e, ${EMBY_PLATFORM}_DEVICE=...")
-endif()
+  add_definitions(-DUSE_HAL_DRIVER -D${${EMBY_PLATFORM}_DEVICE})
+else ()
+  message(FATAL_ERROR "include device i.e, ${EMBY_PLATFORM}_DEVICE=...")
+endif ()
 
 # Include config dir and startup
 list(APPEND SOURCES ${${EMBY_PLATFORM}_STARTUP})
@@ -84,19 +84,19 @@ include_directories(${${EMBY_PLATFORM}_CONF_DIR})
 set(LINKER_SCRIPT ${${EMBY_PLATFORM}_LINKER})
 
 # Prefer platform Impl over core Impl
-EMBY_CHANGE_IMPL_INCLUDE_FROM_EMBY_ROOT(${EMBY_STM32_BAREMETAL_PLATFORM})
-EMBY_INCLUDE_ONLY_IMPL_DIRS(${EMBY_STM32_BAREMETAL_PLATFORM} TRUE)
+EMBY_UTILS_CHANGE_IMPL_INCLUDE_FROM_EMBY_ROOT(${EMBY_STM32_BAREMETAL_PLATFORM})
+EMBY_UTILS_INCLUDE_ONLY_IMPL_DIRS(${EMBY_STM32_BAREMETAL_PLATFORM} TRUE)
 
 # Collect platform sources (drivers/startup/...)
 file(GLOB_RECURSE EMBY_PLAT_SOURCES
-    "${EMBY_STM32_BAREMETAL_PLATFORM}/Startup/*/*.c"
-    "${EMBY_STM32_BAREMETAL_PLATFORM}/Drivers/.../*.c"
+        "${EMBY_STM32_BAREMETAL_PLATFORM}/Startup/*/*.c"
+        "${EMBY_STM32_BAREMETAL_PLATFORM}/Drivers/.../*.c"
 )
-EMBY_ADD_SOURCES(${EMBY_STM32_BAREMETAL_PLATFORM} EMBY_PLAT_SOURCES)
+EMBY_UTILS_ADD_SOURCES(${EMBY_STM32_BAREMETAL_PLATFORM} EMBY_PLAT_SOURCES)
 list(APPEND EMBY_SOURCES ${EMBY_PLAT_SOURCES})
 
 # Create platform library (uses core macro)
-EMBY_CREATE_NAMED_LIB(emby_platform ${EMBY_STM32_BAREMETAL_PLATFORM} ${EMBY_STM32_BAREMETAL_PLATFORM} EMBY_PLAT_SOURCES)
+EMBY_UTILS_CREATE_NAMED_LIB(emby_platform ${EMBY_STM32_BAREMETAL_PLATFORM} ${EMBY_STM32_BAREMETAL_PLATFORM} EMBY_PLAT_SOURCES)
 
 # Append to project SOURCES
 list(APPEND SOURCES ${EMBY_SOURCES})
@@ -128,7 +128,7 @@ Example: create the `emby_platform` library for the current platform
 After collecting platform sources (in `EMBY_PLAT_SOURCES` or `EMBY_SOURCES`) you can call:
 
 ```cmake
-EMBY_CREATE_NAMED_LIB(emby_platform ${EMBY_STM32_BAREMETAL_PLATFORM} ${EMBY_STM32_BAREMETAL_PLATFORM} EMBY_PLAT_SOURCES)
+EMBY_UTILS_CREATE_NAMED_LIB(emby_platform ${EMBY_STM32_BAREMETAL_PLATFORM} ${EMBY_STM32_BAREMETAL_PLATFORM} EMBY_PLAT_SOURCES)
 ```
 
 This creates a static target `emby_platform_<suffix>` and an alias `emby_platform`. The top-level `CMakeLists.txt` links `emby_core` and `emby_platform` into the main executable when those targets exist.
@@ -143,15 +143,16 @@ Best practices and common pitfalls
 
 Practical example (complete snippet for `emby/platforms/MyBoard/emby-platform.cmake`)
 ------------------------------------------------------------------------------------
+
 ```cmake
 set(EMBY_MYBOARD_PLATFORM ${CMAKE_CURRENT_LIST_DIR})
 include("${EMBY_FOLDER}/toolchain.cmake")
 add_compile_definitions(EMBY_BUILD_MYBOARD)
 
 # required checks
-if(NOT DEFINED ${EMBY_PLATFORM}_DEVICE)
-    message(FATAL_ERROR "Set ${EMBY_PLATFORM}_DEVICE")
-endif()
+if (NOT DEFINED ${EMBY_PLATFORM}_DEVICE)
+  message(FATAL_ERROR "Set ${EMBY_PLATFORM}_DEVICE")
+endif ()
 
 # include conf/startup/linker
 list(APPEND SOURCES ${${EMBY_PLATFORM}_STARTUP})
@@ -159,18 +160,18 @@ include_directories(${${EMBY_PLATFORM}_CONF_DIR})
 set(LINKER_SCRIPT ${${EMBY_PLATFORM}_LINKER})
 
 # prefer platform implementations
-EMBY_CHANGE_IMPL_INCLUDE_FROM_EMBY_ROOT(${EMBY_MYBOARD_PLATFORM})
-EMBY_INCLUDE_ONLY_IMPL_DIRS(${EMBY_MYBOARD_PLATFORM} TRUE)
+EMBY_UTILS_CHANGE_IMPL_INCLUDE_FROM_EMBY_ROOT(${EMBY_MYBOARD_PLATFORM})
+EMBY_UTILS_INCLUDE_ONLY_IMPL_DIRS(${EMBY_MYBOARD_PLATFORM} TRUE)
 
 # collect platform sources
 file(GLOB_RECURSE EMBY_PLAT_SOURCES
-    "${EMBY_MYBOARD_PLATFORM}/Drivers/**/*.c"
-    "${EMBY_MYBOARD_PLATFORM}/Startup/**/*.s"
+        "${EMBY_MYBOARD_PLATFORM}/Drivers/**/*.c"
+        "${EMBY_MYBOARD_PLATFORM}/Startup/**/*.s"
 )
-EMBY_ADD_SOURCES(${EMBY_MYBOARD_PLATFORM} EMBY_PLAT_SOURCES)
+EMBY_UTILS_ADD_SOURCES(${EMBY_MYBOARD_PLATFORM} EMBY_PLAT_SOURCES)
 
 # create platform library
-EMBY_CREATE_NAMED_LIB(emby_platform ${EMBY_MYBOARD_PLATFORM} ${EMBY_MYBOARD_PLATFORM} EMBY_PLAT_SOURCES)
+EMBY_UTILS_CREATE_NAMED_LIB(emby_platform ${EMBY_MYBOARD_PLATFORM} ${EMBY_MYBOARD_PLATFORM} EMBY_PLAT_SOURCES)
 
 # append to global sources
 list(APPEND SOURCES ${EMBY_SOURCES})

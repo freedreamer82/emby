@@ -7,7 +7,7 @@ namespace EmbyThreading
 
     Thread::Thread( EmbyThreading::Worker* worker,
     			    char const* name,
-    			    size_t stackSize,
+                    uint32_t stackSize,
                     Priority priority , bool start,uint32_t *stack): m_worker{worker}
 	{
 

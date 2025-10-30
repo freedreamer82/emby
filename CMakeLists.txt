@@ -24,6 +24,8 @@ add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
 # Include directories
 include_directories(src/* src/*/*/)
 
+message(STATUS "PLATFORM: " ${EMBY_PLATFORM})
+
 if("${EMBY_PLATFORM}" STREQUAL "X86_Unix")
     message(STATUS "Including APP x86 PLATFORM")
     include("emby/platforms/X86_Unix/emby-platform.cmake")
@@ -31,14 +33,33 @@ if("${EMBY_PLATFORM}" STREQUAL "X86_Unix")
 
 elseif("${EMBY_PLATFORM}" STREQUAL "STM32xx_Baremetal")
     if("${STM32xx_Baremetal_FAMILY}" STREQUAL "STM32H5xx")
-        message(STATUS "Including APP H5 PLATFORM")
+        message(STATUS "Including APP H5 PLATFORM baremetal")
         include("emby/platforms/STM32xx_Baremetal/emby-platform.cmake")
         include("src/platform/arm/ST/nucleo_stm32H563ZI/app-platform.cmake")
     elseif ("${STM32xx_Baremetal_FAMILY}" STREQUAL "STM32H7xx")
-        message(STATUS "Including APP H7 PLATFORM")
+        message(STATUS "Including APP H7 PLATFORM baremetal")
         include("emby/platforms/STM32xx_Baremetal/emby-platform.cmake")
         include("src/platform/arm/ST/nucleo_stm32H743ZI/app-platform.cmake")
     endif()
+elseif("${EMBY_PLATFORM}" STREQUAL "STM32xx_FreeRTOS")
+    if("${STM32xx_Baremetal_FAMILY}" STREQUAL "STM32H5xx")
+        message(STATUS "Including APP STM32H5 FreeRTOS PLATFORM")
+        #set FreeRTOS environment variables for stm32h5 m33
+        set(ENV{FREERTOS_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/emby/platforms/RTOS/FreeRTOS/FreeRTOS-KernelV10.6.2)
+        set(ENV{FREERTOS_CONFIG_FILE_DIRECTORY} ${CMAKE_CURRENT_SOURCE_DIR}/emby/platforms/RTOS/FreeRTOS/conf)
+        set(ENV{FREERTOS_PORTABLE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/emby/platforms/RTOS/FreeRTOS/FreeRTOS-KernelV10.6.2/portable/GCC/ARM_CM33_NTZ/non_secure/)
+
+        include("emby/platforms/STM32xx_FreeRTOS/emby-platform.cmake")
+        include("src/platform/arm/ST/nucleo_stm32H563ZI/app-platform.cmake")
+
+
+        foreach(src IN LISTS SOURCES)
+            message(STATUS "AA ${src}")
+        endforeach()
+
+
+    elseif ("${STM32xx_Baremetal_FAMILY}" STREQUAL "STM32H7xx")
+    endif ()
 endif()
 
 # Append example project to SOURCES

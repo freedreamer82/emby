@@ -1,7 +1,7 @@
 #include <EmbySystem/Timer.hh>
 // #include <critical.h>
 #include "EmbyDebug/assert.hh"
-#include <EmbySystem/TimerImpl.hh>
+#include "Timer_Impl.hh"
 
 static uint16_t s_timerInstancesCount = 0;
 

@@ -3,7 +3,7 @@
 
 
 #include <EmbyLibs/Callback.hh>
-#include  "TimerImpl.hh"
+#include  "Timer_Impl.hh"
 #include <exception>
 #include <string>
 #include <cstdio>
