@@ -106,3 +106,18 @@ Notes:
 ## Where to find help
 
 Open an issue or create a PR describing the change and include reproduction steps. If you want assistance adding a new platform, point me to the board/family and I can create a starting platform template for you.
+
+## Configurator tool
+
+This repository includes a small helper script to quickly generate a build-time configuration header:
+
+- `emby/emby/misc/tools/emby_config_menu.sh` — a simple text-based configurator using `dialog` that lets you set macros and values, then export them to `emby_config.h`.
+
+See the detailed documentation for this tool in `docs/menu-tool.md` (usage, dependencies, extension points).
+
+If the script is not executable, make it so and run it from the directory where you want `emby_config.h` to be created:
+
+```bash
+chmod +x emby/emby/misc/tools/emby_config_menu.sh
+emby/emby/misc/tools/emby_config_menu.sh
+```
