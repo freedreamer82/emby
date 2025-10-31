@@ -52,12 +52,6 @@ elseif("${EMBY_PLATFORM}" STREQUAL "STM32xx_FreeRTOS")
         include("emby/platforms/STM32xx_FreeRTOS/emby-platform.cmake")
         include("src/platform/arm/ST/nucleo_stm32H563ZI/app-platform.cmake")
 
-
-        foreach(src IN LISTS SOURCES)
-            message(STATUS "AA ${src}")
-        endforeach()
-
-
     elseif ("${STM32xx_Baremetal_FAMILY}" STREQUAL "STM32H7xx")
     endif ()
 endif()

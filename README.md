@@ -90,7 +90,7 @@ Notes:
 ## Platform implementation details
 
 - Core modules live under `emby/core`. When a platform needs to provide a specialized implementation it typically creates the same module path inside `emby/platforms/<PlatformName>` and places platform headers or sources in an `Impl` subdirectory.
-- The CMake helper macro `EMBY_CHANGE_IMPL_INCLUDE_FROM_EMBY_ROOT()` removes matching `core/.../Impl/...` include dirs when the platform provides the same subpath—this lets platform headers take precedence.
+- The CMake helper macro `EMBY_UTILS_SYNC_IMPL_INCLUDES()` includes platform `Impl` subdirectories and removes matching `core/.../Impl/...` include directories when the platform provides the same subpath—this lets platform headers take precedence.
 - Platform CMake files (usually named `emby-platform.cmake`) are responsible for:
   - adding platform-specific compile definitions and toolchain includes,
   - adding startup assembler and linker scripts,

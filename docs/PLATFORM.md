@@ -38,11 +38,11 @@ The file `emby/emby-core.cmake` contains two important macros:
 - `EMBY_INCLUDE_ONLY_IMPL_DIRS(root_folder, debug_mode)`
   - Finds all `*/Impl/*/` directories under `root_folder` and adds those subdirectories to the include paths. This exposes the `Impl` headers from core.
 
-- `EMBY_CHANGE_IMPL_INCLUDE_FROM_EMBY_ROOT(platform_root)`
-  - Scans `platform_root/*/Impl/*/` and, if the platform provides `.hh` headers for a given module/subdir, removes the corresponding `core/<Module>/Impl/<Subdir>` directory from the include paths. This causes includes that previously resolved to `core/.../Impl/...` to resolve to the platform-provided headers instead.
-  - Typical use: call `EMBY_CHANGE_IMPL_INCLUDE_FROM_EMBY_ROOT(${EMBY_STM32_BAREMETAL_PLATFORM})` within a platform CMake file to prefer platform headers.
+- `EMBY_UTILS_SYNC_IMPL_INCLUDES(platform_root [, core_root])`
+  - Includes platform `Impl` subdirectories and, for each platform `Impl` that contains `.hh` headers, removes the corresponding `core/<Module>/Impl/<Subdir>` from the global include paths when present. Accepts an optional `core_root` to check before `EMBY_CORE_FOLDER`.
+  - Typical use: `EMBY_UTILS_SYNC_IMPL_INCLUDES(${EMBY_STM32_BAREMETAL_PLATFORM} "${STM32XX_BAREMETAL_DIR}")` in a platform CMake file to prefer platform headers.
 
-Common platform configuration variables
+# Common platform configuration variables
 --------------------------------------
 The project uses several common variables when invoking CMake to select platform specifics:
 - `EMBY_PLATFORM` — the platform name (e.g. `STM32xx_Baremetal`).
@@ -60,7 +60,8 @@ A platform file (`emby/platforms/<P>/emby-platform.cmake`) typically does the fo
 - Sets environment variables and compile-time definitions (e.g. `EMBY_BUILD_ARM`).
 - Includes the platform `toolchain.cmake`.
 - Validates required variables (`_FAMILY`, `_DEVICE`, `_STARTUP`, `_LINKER`, `_CONF_DIR`) and uses them to add SOURCES and include directories.
-- Calls `EMBY_CHANGE_IMPL_INCLUDE_FROM_EMBY_ROOT` to prefer platform implementations over core ones.
+- Calls `EMBY_UTILS_SYNC_IMPL_INCLUDES` to prefer platform implementations over core ones.
+- Calls `EMBY_UTILS_SYNC_IMPL_INCLUDES` to prefer platform implementations over core ones. This modern all-in-one macro will include platform `Impl` directories and remove corresponding core `Impl` directories when appropriate.
 - Uses `EMBY_ADD_SOURCES` to gather platform and core sources.
 - Creates the `emby_platform` library (or suffixed variant) for linking.
 
@@ -84,8 +85,10 @@ include_directories(${${EMBY_PLATFORM}_CONF_DIR})
 set(LINKER_SCRIPT ${${EMBY_PLATFORM}_LINKER})
 
 # Prefer platform Impl over core Impl
-EMBY_UTILS_CHANGE_IMPL_INCLUDE_FROM_EMBY_ROOT(${EMBY_STM32_BAREMETAL_PLATFORM})
-EMBY_UTILS_INCLUDE_ONLY_IMPL_DIRS(${EMBY_STM32_BAREMETAL_PLATFORM} TRUE)
+EMBY_UTILS_SYNC_IMPL_INCLUDES(${EMBY_STM32_BAREMETAL_PLATFORM} "${STM32XX_BAREMETAL_DIR}")
+# Note: EMBY_UTILS_SYNC_IMPL_INCLUDES already includes platform Impl subdirs; calling
+# EMBY_UTILS_INCLUDE_ONLY_IMPL_DIRS afterwards is redundant unless you need different
+# debug verbosity or a second explicit include pass.
 
 # Collect platform sources (drivers/startup/...)
 file(GLOB_RECURSE EMBY_PLAT_SOURCES
@@ -104,13 +107,13 @@ list(APPEND SOURCES ${EMBY_SOURCES})
 
 Macros and helpers
 ------------------
-The following macros live in `emby/emby-core.cmake` and in platform CMake files:
+- The following macros live in `emby/emby-core.cmake` and in platform CMake files:
 
 - `EMBY_INCLUDE_ONLY_IMPL_DIRS(root_folder, debug_mode)`
   - Adds only `*/Impl/*/` subdirectories under `root_folder` to the include paths.
 
-- `EMBY_CHANGE_IMPL_INCLUDE_FROM_EMBY_ROOT(platform_root)`
-  - Removes corresponding `core/.../Impl/...` subdirectories from include paths if the platform provides the same subpath (it detects presence using `.hh` files).
+- `EMBY_UTILS_SYNC_IMPL_INCLUDES(platform_root [, core_root])`
+  - Includes platform `Impl` subdirectories and removes corresponding `core/.../Impl/...` subdirectories from the include paths when the platform provides `.hh` headers for a submodule. Accepts an optional `core_root` to check before `EMBY_CORE_FOLDER`.
 
 - `EMBY_ADD_SOURCES(START_ROOT OUT_VAR)`
   - Recursively searches `.cc`/`.c` under `START_ROOT` for predefined core modules (e.g. `EmbyConsole`, `EmbySystem`, etc.) and populates `OUT_VAR` with found sources. Useful to collect core or platform sources.
@@ -136,7 +139,7 @@ This creates a static target `emby_platform_<suffix>` and an alias `emby_platfor
 Best practices and common pitfalls
 ---------------------------------
 - Header/impl consistency: ensure that functions declared in `core/.../System.hh` have compatible implementations in the platform (same signature and namespace). Mismatched signatures or platform source compile errors often produce "undefined reference" at link time.
-- When you provide implementations in `platform/.../<Module>/Impl/...`, call `EMBY_CHANGE_IMPL_INCLUDE_FROM_EMBY_ROOT` so the platform headers are used instead of core ones.
+- When you provide implementations in `platform/.../<Module>/Impl/...`, call `EMBY_UTILS_SYNC_IMPL_INCLUDES` so the platform headers are preferred over core ones. This macro also ensures platform `Impl` subdirs are added to the include paths.
 - Prefer `target_include_directories` and `target_link_libraries` for new targets to keep include and link dependencies explicit. The project contains many global includes for historical reasons; try to encapsulate new targets where practical.
 - Validate that variables such as `LINKER_SCRIPT`, `STARTUP`, and device definitions are actually set; platform CMake files often use `message(FATAL_ERROR ...)` to stop the configuration if something is missing.
 - If you add startup assembly files or linker scripts, make sure they are added to `SOURCES` so they are considered by the build system.
@@ -160,7 +163,7 @@ include_directories(${${EMBY_PLATFORM}_CONF_DIR})
 set(LINKER_SCRIPT ${${EMBY_PLATFORM}_LINKER})
 
 # prefer platform implementations
-EMBY_UTILS_CHANGE_IMPL_INCLUDE_FROM_EMBY_ROOT(${EMBY_MYBOARD_PLATFORM})
+EMBY_UTILS_SYNC_IMPL_INCLUDES(${EMBY_MYBOARD_PLATFORM})
 EMBY_UTILS_INCLUDE_ONLY_IMPL_DIRS(${EMBY_MYBOARD_PLATFORM} TRUE)
 
 # collect platform sources

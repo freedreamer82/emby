@@ -15,70 +15,8 @@ macro(EMBY_UTILS_INCLUDE_ONLY_IMPL_DIRS root_folder debug_mode)
     endforeach()
 endmacro()
 
-#macro(EMBY_CHANGE_IMPL_INCLUDE_FROM_EMBY_ROOT platform_root)
-#    get_property(current_includes DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
-#
-#    # Trova le directory Impl che esistono nella platform
-#    file(GLOB plat_impl_dirs "${platform_root}/*/Impl/*/")
-#
-#    foreach(plat_impl_dir ${plat_impl_dirs})
-#        # Ottieni il nome del modulo (es: EmbySystem da .../EmbySystem/Impl)
-#        get_filename_component(parent_dir ${plat_impl_dir} DIRECTORY)
-#        get_filename_component(module_name ${parent_dir} NAME)
-#
-#        # Costruisci il path corrispondente in core
-#        set(core_impl "${EMBY_FOLDER}/core/${module_name}/Impl")
-#
-#        # Rimuovi solo se esiste in core
-#        if(EXISTS ${core_impl})
-#            list(REMOVE_ITEM current_includes ${core_impl})
-#            message(STATUS "Rimossa include ovunque: ${core_impl}")
-#        endif()
-#    endforeach()
-#
-#    set_property(DIRECTORY PROPERTY INCLUDE_DIRECTORIES ${current_includes})
-#endmacro()
-#
-#macro(EMBY_UTILS_CHANGE_IMPL_INCLUDE_FROM_EMBY_ROOT platform_root)
-#    # Usa ARGV1 per accedere al secondo argomento opzionale
-#    set(core_root "${ARGV1}")
-#
-#    if(NOT "${core_root}" STREQUAL "" AND EXISTS "${core_root}")
-#        set(chosen_core_root "${core_root}")
-#     #   message(STATUS "EMBY_UTILS: core_root passato ed esiste, uso chosen_core_root='${chosen_core_root}'")
-#    elseif(DEFINED EMBY_CORE_FOLDER AND NOT "${EMBY_CORE_FOLDER}" STREQUAL "")
-#        set(chosen_core_root "${EMBY_CORE_FOLDER}")
-#    #    message(STATUS "EMBY_UTILS: core_root non passato, vuoto o non esiste, uso EMBY_CORE_FOLDER='${EMBY_CORE_FOLDER}'")
-#    else()
-#        message(FATAL_ERROR "EMBY_CORE_FOLDER non definita!")
-#    endif()
-#
-#    message(STATUS "platform_root='${platform_root}', chosen_core_root='${chosen_core_root}'")
-#    get_property(current_includes DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
-#    file(GLOB plat_impl_dirs "${platform_root}/*/Impl")
-#
-#    foreach(plat_impl_dir ${plat_impl_dirs})
-#        get_filename_component(parent_dir ${plat_impl_dir} DIRECTORY)
-#        get_filename_component(module_name ${parent_dir} NAME)
-#        file(GLOB plat_impl_subdirs "${plat_impl_dir}/*/")
-#
-#        foreach(plat_impl_subdir ${plat_impl_subdirs})
-#            file(GLOB hh_files "${plat_impl_subdir}/*.hh")
-#            if(hh_files)
-#                get_filename_component(subdir_name ${plat_impl_subdir} NAME)
-#                set(core_impl_subdir "${chosen_core_root}/${module_name}/Impl/${subdir_name}")
-#                if(EXISTS ${core_impl_subdir})
-#                    list(REMOVE_ITEM current_includes ${core_impl_subdir})
-#                    message(STATUS "Removed include: ${core_impl_subdir}")
-#                endif()
-#            endif()
-#        endforeach()
-#    endforeach()
-#
-#    set_property(DIRECTORY PROPERTY INCLUDE_DIRECTORIES ${current_includes})
-#endmacro()
 
-macro(EMBY_UTILS_CHANGE_IMPL_INCLUDE_FROM_EMBY_ROOT platform_root)
+macro(EMBY_UTILS_SYNC_IMPL_INCLUDES platform_root)
     # Usa ARGV1 per accedere al secondo argomento opzionale
     set(core_root "${ARGV1}")
 
@@ -95,6 +33,14 @@ macro(EMBY_UTILS_CHANGE_IMPL_INCLUDE_FROM_EMBY_ROOT platform_root)
         message(STATUS "EMBY_UTILS: using EMBY_CORE_FOLDER='${chosen_core_root}'")
     else()
         message(STATUS "EMBY_UTILS: no core root available; will skip removal from core roots")
+    endif()
+
+    # Aggiungo le include delle sottodirectory Impl della piattaforma in una sola chiamata
+    # Usa il macro che include solo le sottodirectory Impl (debug-mode = FALSE per default non verboso)
+    if(EXISTS "${platform_root}")
+        EMBY_UTILS_INCLUDE_ONLY_IMPL_DIRS(${platform_root} TRUE)
+    else()
+        message(STATUS "EMBY_UTILS: platform_root '${platform_root}' does not exist; skipping include of Impl dirs")
     endif()
 
     file(GLOB plat_impl_dirs "${platform_root}/*/Impl")
@@ -453,16 +399,39 @@ macro(EMBY_UTILS_REMOVE_DIRS_FROM_INCLUDE folder2remove)
     string(REGEX REPLACE "/+$" "" _f_no_slash "${_f_norm}")
     set(_variants "${_f_no_slash}" "${_f_no_slash}/")
 
-    message(STATUS "removing include variants: ${_variants}")
     # Leggi include della DIRECTORY corrente
     get_property(dirs DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
-    foreach(_v ${_variants})
-        list(REMOVE_ITEM dirs ${_v})
+    if(NOT dirs)
+        message(STATUS "EMBY_UTILS_REMOVE_DIRS_FROM_INCLUDE: no include directories set; nothing to remove")
+        return()
+    endif()
+
+    set(_removed_any FALSE)
+
+    # Per ogni variante normalizzata, confrontiamo con le entry correnti normalizzando anch'esse
+    foreach(_variant ${_variants})
+        # normalizza la variante per confronti (rimuove backslash e slash finali)
+        string(REPLACE "\\\\" "/" _variant_norm "${_variant}")
+        string(REGEX REPLACE "/+$" "" _variant_norm "${_variant_norm}")
+
+        # controlla ciascuna entry esistente
+        foreach(_entry ${dirs})
+            string(REPLACE "\\\\" "/" _entry_norm "${_entry}")
+            string(REGEX REPLACE "/+$" "" _entry_norm "${_entry_norm}")
+
+            if(_entry_norm STREQUAL _variant_norm)
+                list(REMOVE_ITEM dirs ${_entry})
+                message(STATUS "removed include: ${_entry}")
+                set(_removed_any TRUE)
+            endif()
+        endforeach()
     endforeach()
-    # Aggiorna le include della DIRECTORY corrente
+
+    # Rimuovi eventuali duplicati residui e aggiorna la proprietà
+    list(REMOVE_DUPLICATES dirs)
     set_property(DIRECTORY PROPERTY INCLUDE_DIRECTORIES ${dirs})
 
- ENDMACRO()
+ENDMACRO()
 
 
 
