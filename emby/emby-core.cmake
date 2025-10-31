@@ -11,6 +11,7 @@ set(EMBY_CORE_FOLDER "${EMBY_FOLDER}/core")
 set(ENV{EMBY_CORE_FOLDER} "${EMBY_CORE_FOLDER}")
 
 
+include_directories("${EMBY_FOLDER}/Include")
 include("${EMBY_FOLDER}/emby-utils.cmake")
 
 message(STATUS "Emby Core cmake included from: " ${EMBY_FOLDER})
