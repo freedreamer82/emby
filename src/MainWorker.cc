@@ -1,10 +1,6 @@
 #include "MainWorker.hh"
-#include <EmbyConsole/ConsoleWorker.hh>
-#include <EmbyConsole/ConsoleUart.hh>
-#include <EmbyLog/LogLevel.hh>
-#include <EmbyMachine/Serial.hh>
-#include "Console/ConsoleCommands.hh"
-#include <EmbyLog/Log.hh>
+#include "Emby.hh"
+#include "ConsoleCommands.hh"
 
 #ifdef EMBY_BUILD_X86
 #include <EmbyConsole/ConsoleTelnet.hh>

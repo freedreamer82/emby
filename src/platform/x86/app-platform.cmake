@@ -15,7 +15,9 @@ else ()
     set(LDFLAGS "${LDFLAGS} --gc-sections")
 endif ()
 
-include_directories(${CMAKE_SOURCE_DIR}/src/x86)
+
+include_directories(${CMAKE_SOURCE_DIR}/src/x86,
+        "${CMAKE_SOURCE_DIR}/src/Console")
 
 file(GLOB_RECURSE APP_SOURCES
     "${CMAKE_SOURCE_DIR}/src/x86/EmbyAppMachine.cc"

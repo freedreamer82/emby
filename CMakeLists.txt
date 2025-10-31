@@ -22,7 +22,9 @@ add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-le
 add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
 
 # Include directories
-include_directories(src/* src/*/*/)
+#include_directories(src/* src/*/*/)
+
+include_directories(emby/Include)
 
 message(STATUS "PLATFORM: " ${EMBY_PLATFORM})
 

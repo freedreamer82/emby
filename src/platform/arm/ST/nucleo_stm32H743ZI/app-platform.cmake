@@ -12,6 +12,7 @@ message(STATUS "app-platform.cmake for H7..")
 include_directories(
         "${CMAKE_SOURCE_DIR}/src/platform/arm/ST/nucleo_stm32H743ZI"
         "${CMAKE_SOURCE_DIR}/src/platform/arm/ST/nucleo_stm32H743ZI/conf"
+        "${CMAKE_SOURCE_DIR}/src/Console"
 )
 
 # Gather application source files
