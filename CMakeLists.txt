@@ -14,11 +14,8 @@ else()
 endif()
 
 # Include Emby framework
-if(EMBY_FOLDER)
-    message(STATUS "including EMBY cmake: ${EMBY_FOLDER}/emby.cmake")
-    set(ENV{EMBY_FOLDER} ["${EMBY_FOLDER}"])
-    include("${EMBY_FOLDER}/emby.cmake")
-endif()
+
+include("emby/emby-core.cmake")
 
 # Compiler options
 add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0)
@@ -27,17 +24,36 @@ add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
 # Include directories
 include_directories(src/* src/*/*/)
 
+message(STATUS "PLATFORM: " ${EMBY_PLATFORM})
+
 if("${EMBY_PLATFORM}" STREQUAL "X86_Unix")
     message(STATUS "Including APP x86 PLATFORM")
+    include("emby/platforms/X86_Unix/emby-platform.cmake")
     include("src/platform/x86/app-platform.cmake")
+
 elseif("${EMBY_PLATFORM}" STREQUAL "STM32xx_Baremetal")
     if("${STM32xx_Baremetal_FAMILY}" STREQUAL "STM32H5xx")
-        message(STATUS "Including APP H5 PLATFORM")
+        message(STATUS "Including APP H5 PLATFORM baremetal")
+        include("emby/platforms/STM32xx_Baremetal/emby-platform.cmake")
         include("src/platform/arm/ST/nucleo_stm32H563ZI/app-platform.cmake")
     elseif ("${STM32xx_Baremetal_FAMILY}" STREQUAL "STM32H7xx")
-        message(STATUS "Including APP H7 PLATFORM")
+        message(STATUS "Including APP H7 PLATFORM baremetal")
+        include("emby/platforms/STM32xx_Baremetal/emby-platform.cmake")
         include("src/platform/arm/ST/nucleo_stm32H743ZI/app-platform.cmake")
     endif()
+elseif("${EMBY_PLATFORM}" STREQUAL "STM32xx_FreeRTOS")
+    if("${STM32xx_Baremetal_FAMILY}" STREQUAL "STM32H5xx")
+        message(STATUS "Including APP STM32H5 FreeRTOS PLATFORM")
+        #set FreeRTOS environment variables for stm32h5 m33
+        set(ENV{FREERTOS_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/emby/platforms/RTOS/FreeRTOS/FreeRTOS-KernelV10.6.2)
+        set(ENV{FREERTOS_CONFIG_FILE_DIRECTORY} ${CMAKE_CURRENT_SOURCE_DIR}/emby/platforms/RTOS/FreeRTOS/conf)
+        set(ENV{FREERTOS_PORTABLE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/emby/platforms/RTOS/FreeRTOS/FreeRTOS-KernelV10.6.2/portable/GCC/ARM_CM33_NTZ/non_secure/)
+
+        include("emby/platforms/STM32xx_FreeRTOS/emby-platform.cmake")
+        include("src/platform/arm/ST/nucleo_stm32H563ZI/app-platform.cmake")
+
+    elseif ("${STM32xx_Baremetal_FAMILY}" STREQUAL "STM32H7xx")
+    endif ()
 endif()
 
 # Append example project to SOURCES
@@ -47,7 +63,11 @@ file(GLOB_RECURSE APP_SOURCES
     "src/MainWorker.cc"
 )
 
-list(APPEND SOURCES ${APP_SOURCES} ${EMBY_SOURCES})
+# Non aggiungere più EMBY_SOURCES direttamente a SOURCES: useremo librerie
+list(APPEND SOURCES ${APP_SOURCES})
+
+# NOTE: emby_core and emby_platform library targets are created in their respective
+# cmake files (emby-core.cmake creates emby_core; platform cmake creates emby_platform)
 
 # Project settings
 project(emby-test_${EMBY_PLATFORM} CXX C ASM)
@@ -74,9 +94,17 @@ else()
     add_executable(${PROJECT_NAME} ${SOURCES})
 endif()
 
+# Link main executable with emby libraries if they exist
+if(TARGET emby_core)
+    target_link_libraries(${PROJECT_NAME} PRIVATE emby_core)
+endif()
+if(TARGET emby_platform)
+    target_link_libraries(${PROJECT_NAME} PRIVATE emby_platform)
+endif()
+
 
 if (${EMBY_PLATFORM} STREQUAL "STM32xx_Baremetal")
-    set(CUSTOM_NAME_EXEC "embt-test_${EMBY_PLATFORM}_${STM32xx_Baremetal_DEVICE}")
+    set(CUSTOM_NAME_EXEC "emby-test_${EMBY_PLATFORM}_${STM32xx_Baremetal_DEVICE}")
 endif ()
 
 if (CUSTOM_NAME_EXEC)

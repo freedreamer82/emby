@@ -10,7 +10,7 @@
 
 using namespace EmbyThreading;
 
-class MainWorker : public EmbyThreading::Worker
+class MainWorker: public EmbyThreading::Worker
 {
 public:
     MainWorker();
@@ -20,13 +20,14 @@ public:
 private:
     [[noreturn]] virtual void doWork();
 
-    bool onErrors( EmbySystem::ErrorCode *err, EmbySystem::SystemError::Status status);
+    bool onErrors(EmbySystem::ErrorCode *err, EmbySystem::SystemError::Status status);
 
     static size_t const STACK_SIZE = 600;
-    static auto const PRIORITY =  EmbyThreading::Thread::Priority::Normal;
+    static auto const PRIORITY = EmbyThreading::Thread::Priority::Normal;
 
     EmbyThreading::Thread m_thread;
 };
+
 #endif
 ///@}
 
