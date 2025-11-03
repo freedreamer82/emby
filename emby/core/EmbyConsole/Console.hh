@@ -66,12 +66,7 @@ namespace EmbyConsole
 
     static constexpr int EMBY_CFG_MAX_CONSOLE_PWD_SIZE = getMaxPasswordLen(EMBY_CFG_CONSOLE_LOGIN_GUEST_PSW,
                                                                            EMBY_CFG_CONSOLE_LOGIN_ROOT_PSW);
-//    #if 0 == c_strcmp(EMBY_CFG_CONSOLE_LOGIN_GUEST_PSW,EMBY_CFG_CONSOLE_LOGIN_ROOT_PSW )
-//        #define EMBY_CFG_MAX_CONSOLE_PWD_SIZE 3
-//        #define DISPLAY_VALUE2(x) #x
-//        #define DISPLAY_VALUE(x) DISPLAY_VALUE2(x)
-//        #pragma message( "My Value  = " DISPLAY_VALUE(EMBY_CFG_MAX_CONSOLE_PWD_SIZE) )
-//    #endif
+
 #endif
 
 
