@@ -24,10 +24,9 @@ static const CommandInfo g_Commands[] =
 
 
 ConsoleCommandsProject::ConsoleCommandsProject(Context const &ctx)
-        : m_ctx{ctx}
+        : ConsoleCommands{g_Commands, sizeof(g_Commands) / sizeof(g_Commands)[0]}, m_ctx{ctx}
 {
-    m_tableCommands = g_Commands;
-    m_tableCommandsSize = sizeof(g_Commands);
+
 }
 
 CommandErrorCode

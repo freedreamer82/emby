@@ -451,7 +451,7 @@ namespace EmbyConsole
             else if (tableCmdIdx == 1 && m_appCommands != nullptr)
             {
                 tableCommands = m_appCommands->getCommandsDescription();
-                tableElemSize = m_appCommands->getCommandsDescriptionSize() / sizeof(CommandInfo);
+                tableElemSize = m_appCommands->getCommandsDescriptionCount();
             }
 
             if (tableCommands)
@@ -830,7 +830,7 @@ namespace EmbyConsole
             else if (tableCmdIdx == 1 && m_appCommands != nullptr)
             {
                 tableCommands = m_appCommands->getCommandsDescription();
-                tableElemSize = m_appCommands->getCommandsDescriptionSize() / sizeof(CommandInfo);
+                tableElemSize = m_appCommands->getCommandsDescriptionCount();
             }
 
             if (tableCommands)

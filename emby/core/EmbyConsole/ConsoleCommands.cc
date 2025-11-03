@@ -8,6 +8,13 @@ namespace EmbyConsole
     {
     }
 
+    ConsoleCommands::ConsoleCommands(CommandInfo const *table, size_t entries) :
+            m_tableCommands{table},
+            m_tableCommandsCount{entries}
+    {
+    }
+
+
 }  // end of namespace EmbyConsole
 ///@}
 

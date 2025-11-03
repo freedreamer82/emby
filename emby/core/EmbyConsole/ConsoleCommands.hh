@@ -66,14 +66,13 @@ namespace EmbyConsole
 			}
 
 			size_t
-			getCommandsDescriptionSize() const
+			getCommandsDescriptionCount() const
 			{
-				return m_tableCommandsSize;
+				return m_tableCommandsCount;
 			}
 
 		protected:
-			ConsoleCommands() : m_tableCommands(nullptr) , m_tableCommandsSize(0)
-			{}
+			ConsoleCommands( CommandInfo const* table, size_t entries) ;
 
 			virtual ~ConsoleCommands();
 
@@ -84,7 +83,7 @@ namespace EmbyConsole
 	                 int argsNo ) = 0;
 
 			CommandInfo const * m_tableCommands;
-			size_t				m_tableCommandsSize;
+			size_t				m_tableCommandsCount;
 	};
 }
 
