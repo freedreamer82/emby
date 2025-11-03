@@ -89,7 +89,7 @@ namespace EmbyLog
      */
     void flush();
 
-#if defined( EMBY_DISABLE_LOGS )
+#if defined( EMBY_CFG_DISABLE_LOGS )
     #define log_trace( ...)
     #define log_debug( ...)
     #define log_info(...)

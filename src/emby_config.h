@@ -14,3 +14,6 @@
 #define  EMBY_CFG_STRING_MEDIUM_POOL_SIZE                    15
 #define  EMBY_CFG_STRING_SHORT_POOL_SIZE                     60
 #define  EMBY_CFG_SYSTEM_ERROR_BUFFER_SIZE                   5
+
+#define  EMBY_CFG_LOG_IRQ_BUFFER
+#define  EMBY_CFG_LOG_IRQ_BUFFER_SIZE                        5

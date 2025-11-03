@@ -44,6 +44,17 @@ embyconfig["EMBY_CFG_CONSOLE_THREAD_STACK_SIZE"]=500
 #
 embyconfig["EMBY_CFG_SYSTEM_ERROR_BUFFER_SIZE"]=5
 
+# Log-related defaults (new) - use "true"/"false"
+# EMBY_CFG_LOG_IRQ_BUFFER: true = enabled, false = disabled
+embyconfig["EMBY_CFG_LOG_IRQ_BUFFER"]="false"
+# EMBY_CFG_DISABLE_LOGS: false = logs enabled, true = logs disabled
+embyconfig["EMBY_CFG_DISABLE_LOGS"]="false"
+# EMBY_CFG_LOG_IRQ_BUFFER_SIZE: numeric size for IRQ log buffer
+embyconfig["EMBY_CFG_LOG_IRQ_BUFFER_SIZE"]=5
+
+# List of boolean keys that should be omitted from generated header when set to false
+SKIP_IF_FALSE=("EMBY_CFG_DISABLE_LOGS" "EMBY_CFG_LOG_IRQ_BUFFER")
+
 #hashmap["key"]="value"
 #hashmap["key2"]="value2"
 #echo "${hashmap["key"]}"
@@ -62,10 +73,32 @@ function save_config_file() {
   keys=$(echo ${!embyconfig[@]} | tr ' ' $'\n' | sort)
   for k in ${keys[@]}; do
 
+    # Skip boolean keys that are set to false
+    skip=0
+    for b in "${SKIP_IF_FALSE[@]}"; do
+      if [ "$k" == "$b" ] && [ "${embyconfig[$k]}" == "false" ]; then
+        skip=1
+        break
+      fi
+    done
+    if [ $skip -eq 1 ]; then
+      continue
+    fi
+
     VALUE="${embyconfig["$k"]}"
-    if [[ "$VALUE" == ?(-)+([0-9]) ]]; then
-      #is a number...
-      pass
+
+    # If the value is the literal 'true' or 'false', handle specially
+    if [[ "$VALUE" == "true" ]]; then
+      # emit a bare define without a value (so #ifdef KEY works)
+      printf "#define  %s\n" $k >>$CONFIG_PATH
+      continue
+    elif [[ "$VALUE" == "false" ]]; then
+      # shouldn't happen here because SKIP_IF_FALSE prevents false booleans in the list,
+      # but keep the guard: skip
+      continue
+    elif [[ "$VALUE" == ?(-)+([0-9]) ]]; then
+      # is a number... fallthrough to formatted print
+      :
     elif [ $VALUE == $NOT_VALID ]; then
       VALUE=
       echo $VALUE >>$DEBUG
@@ -86,6 +119,23 @@ function change_value_popup() {
   #  echo $VALUE >>$DEBUG
   embyconfig[$KEY]=$VALUE
   #  echo "${embyconfig[$KEY]}" >>$DEBUG
+}
+
+# New helper to change boolean values using a small menu
+function change_boolean_popup() {
+  KEY="$1"
+  CURRENT="${embyconfig[$KEY]}"
+  dialog --backtitle "$BACKTITLE" \
+    --title "Toggle" \
+    --clear \
+    --menu "Select value for $KEY" 10 50 2 \
+    true "Enable" \
+    false "Disable" 2>"${INPUT}"
+
+  sel=$(<"${INPUT}")
+  if [ -n "$sel" ]; then
+    embyconfig[$KEY]=$sel
+  fi
 }
 
 function show_container() {
@@ -109,15 +159,6 @@ function show_container() {
       embyconfig["EMBY_CFG_DISABLE_BUFFER_CRITICAL_SECTIONS"]=$NOT_VALID
     fi
   done
-  #
-  #  menuitem=$(<"${INPUT}")
-  #
-  #  case $menuitem in
-  #  "Line Cursor") change_value_popup EMBY_CFG_CONSOLE_LINE_CURSOR ;;
-  #  *)
-  #    echo "???"
-  #    ;;
-  #  esac
 }
 
 function show_console() {
@@ -189,6 +230,28 @@ function show_strings() {
 
 }
 
+# --- New: Logs section ---
+function show_logs() {
+  dialog --backtitle "$BACKTITLE" \
+    --title "[ EMBY LOGS ]" \
+    --clear \
+    --menu "" 15 60 4 \
+    "Enable IRQ Buffer" "${embyconfig["EMBY_CFG_LOG_IRQ_BUFFER"]}" \
+    "Disable Logs" "${embyconfig["EMBY_CFG_DISABLE_LOGS"]}" \
+    "IRQ Buffer Size" "${embyconfig["EMBY_CFG_LOG_IRQ_BUFFER_SIZE"]}" 2>"${INPUT}"
+
+  menuitem=$(<"${INPUT}")
+
+  case $menuitem in
+  "Enable IRQ Buffer") change_boolean_popup EMBY_CFG_LOG_IRQ_BUFFER ;;
+  "Disable Logs") change_boolean_popup EMBY_CFG_DISABLE_LOGS ;;
+  "IRQ Buffer Size") change_value_popup EMBY_CFG_LOG_IRQ_BUFFER_SIZE ;;
+  *)
+    echo "???"
+    ;;
+  esac
+}
+
 #
 # set infinite loop
 #
@@ -207,6 +270,7 @@ Choose the TASK" 18 70 4 \
     System "System config" \
     Console "Console config" \
     Containers "Containers config" \
+    Logs "Logs config" \
     "Save Config" "Export Configuration in a file" \
     Exit "Exit to the shell" 2>"${INPUT}"
 
@@ -218,6 +282,7 @@ Choose the TASK" 18 70 4 \
   System) show_system ;;
   Console) show_console ;;
   Containers) show_container ;;
+  Logs) show_logs ;;
   "Save Config") save_config_file ;;
   Exit)
     exit 0

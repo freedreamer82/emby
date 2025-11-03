@@ -24,8 +24,7 @@ LogBus::log( EmbyLog::LogLevel level,
 
 	if(EmbySystem::isInInterrupt())
 	{
-		//NO logs from isr allowed!
-		EmbyDebug_ASSERT_FAIL();
+		//do nothing!
 	}
 	else
 	{
