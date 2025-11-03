@@ -25,6 +25,7 @@ namespace EmbyLog
 #ifdef EMBY_CFG_LOG_IRQ_BUFFER
         if (EmbySystem::isInInterrupt())
         {
+            // In IRQ context: buffer the log message without formatting
             LogMessage msg(EmbyLibs::String(fmt), 0, level, logClass);
             g_irqLogBuffer.push(msg);
         }
